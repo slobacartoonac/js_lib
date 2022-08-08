@@ -1,0 +1,20 @@
+{
+  "name": "pythonium-libs",
+  "version": "1.0.0",
+  "description": "Common used libs in pythonium",
+  "main": "ecs.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Slobodan Zikvoivc (slobacartoonac@gmail.com)",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.9",
+    "@babel/register": "^7.14.5",
+    "mocha": "^9.0.3"
+  }
+}
