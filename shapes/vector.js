@@ -35,10 +35,10 @@ function Vector(...array) {
 Vector.prototype = Object.create(Array.prototype)
 Vector.prototype.add = function (toAdd) {
 	for (var k = 0; k < this.length; k++) {
-		if (!this.hasOwnProperty(k)) {
+		if (!Object.hasOwnProperty.call(this, k)) {
 			break;
 		}
-		if (!toAdd.hasOwnProperty(k)) {
+		if (!Object.hasOwnProperty.call(toAdd, k)) {
 			break;
 		}
 		this[k] += toAdd[k]
