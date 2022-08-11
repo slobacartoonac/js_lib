@@ -26,7 +26,6 @@ function getZoom(p1, n1, p2, n2) {
 }
 
 function Touch(div, deadzone) {
-	const link = this
 	this.deadzone = deadzone
 	this.clear()
 	let startMove = null
@@ -37,7 +36,7 @@ function Touch(div, deadzone) {
 	let click = true;
 	let touch = false;
 	let touchSecound = false;
-	function moveTouchT(e) {
+	const moveTouchT = (e) => {
 		e.preventDefault()
 		const { top, left } = e.target.getBoundingClientRect()
 		if (e.touches[1])
@@ -46,12 +45,12 @@ function Touch(div, deadzone) {
 		if (e.touches[0])
 			return moveTouch({ x: e.touches[0].clientX - left, y: e.touches[0].clientY - top })
 	}
-	function moveTouchM(e) {
+	const moveTouchM = (e) => {
 		e.preventDefault()
 		const { top, left } = e.target.getBoundingClientRect()
 		if (mouseDown) moveTouch({ x: e.clientX - left, y: e.clientY - top })
 	}
-	function moveTouch(e, secound) {
+	const moveTouch = (e, secound) => {
 		touch = true;
 		if (secound && startMoveSecound == null) {
 			touchSecound = true;
@@ -66,7 +65,7 @@ function Touch(div, deadzone) {
 		if (startMove == null) {
 			startMove = { x: e.x, y: e.y }
 			thisMove = { x: e.x, y: e.y }
-			link.triger('start', thisMove)
+			this.triger('start', thisMove)
 			click = true
 		} else {
 
@@ -76,7 +75,7 @@ function Touch(div, deadzone) {
 			thisMoveSecound = secound ? { x: secound.x, y: secound.y } : null
 			const direction = getDelta(startMove, thisMove, startMoveSecound, thisMoveSecound)
 			const zoom = getZoom(startMove, thisMove, startMoveSecound, thisMoveSecound)
-			link.triger('force', {
+			this.triger('force', {
 				delta,
 				direction,
 				startPosition: startMove,
@@ -96,24 +95,24 @@ function Touch(div, deadzone) {
 				// ${deltaZoom}
 				// `
 			})
-			if (distance2d(startMove, thisMove) > link.deadzone) {
+			if (distance2d(startMove, thisMove) > this.deadzone) {
 				click = false
 				if (Math.abs(direction.x) > Math.abs(direction.y)) {
 					if (direction.x > 0) {
-						link.triger('left')
+						this.triger('left')
 					} else {
-						link.triger('right')
+						this.triger('right')
 					}
 				} else if (direction.y > 0) {
-					link.triger('down')
+					this.triger('down')
 				} else {
-					link.triger('up')
+					this.triger('up')
 				}
 			}
 		}
 	}
 	//= {up:[],down:[],left:[],right:[],stop:[],click:[],force:[]}
-	function stopTouch(e) {
+	const stopTouch = (e) => {
 		e.preventDefault()
 		if (touch == false) {
 			return
@@ -122,10 +121,10 @@ function Touch(div, deadzone) {
 		touchSecound = false
 		if (click) {
 			if (e.button) {
-				if (e.button === 1) link.triger('bmiddle')
-				if (e.button === 2) link.triger('bright')
+				if (e.button === 1) this.triger('bmiddle')
+				if (e.button === 2) this.triger('bright')
 			} else if (startMove) {
-				link.triger('click', startMove)
+				this.triger('click', startMove)
 			}
 		}
 		const delta = { x: 0, y: 0 }
@@ -139,7 +138,7 @@ function Touch(div, deadzone) {
 			distance = distance2d(startMove, thisMove)
 		}
 
-		link.triger('stop', {
+		this.triger('stop', {
 			delta,
 			direction,
 			startPosition: startMove,
@@ -176,6 +175,17 @@ function Touch(div, deadzone) {
 Touch.prototype.sub = function (ev, func) {
 	if (this.events[ev]) this.events[ev].push(func)
 }
+
+Touch.prototype.onClick = function (func) {
+	this.events.click.push(func)
+}
+Touch.prototype.onForce = function (func) {
+	this.events.force.push(func)
+}
+Touch.prototype.onStop = function (func) {
+	this.events.stop.push(func)
+}
+
 Touch.prototype.unsub = function (ev, func) {
 	if (this.events[ev])
 		this.events[ev] = this.events[ev].filter(fu => fu !== func)
