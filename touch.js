@@ -38,6 +38,8 @@ function Touch(div, deadzone) {
 	let touchSecound = false;
 	this.mousePosition = { x: 0, y: 0 };
 	this.debug = false;
+	this.console_error = false;
+	this.throw_error = false;
 	this.last_error = ''
 	const moveTouchT = (e) => {
 		e.preventDefault()
@@ -134,7 +136,6 @@ ${this.last_error}`
 	//= {up:[],down:[],left:[],right:[],stop:[],click:[],force:[]}
 	const stopTouch = (e) => {
 		e.preventDefault()
-		console.log(e)
 		if (touch == false) {
 			return
 		}
@@ -237,12 +238,12 @@ Touch.prototype.triger = function (ev, args) {
 				func(args)
 			}
 			catch (e) {
-				console.log(e)
+				if (this.console_error) console.log(e)
 				this.last_error = 'Error: ' + e.name +
 					' ' + e.foo +
 					' ' + e.message +
 					' ' + e.stack
-				//if (this.debug) throw e
+				if (this.throw_error) throw e
 			}
 		})
 }
