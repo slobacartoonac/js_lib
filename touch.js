@@ -38,7 +38,7 @@ function Touch(div, deadzone) {
 	let touchSecound = false;
 	this.mousePosition = { x: 0, y: 0 };
 	this.debug = false;
-	let last_error = ''
+	this.last_error = ''
 	const moveTouchT = (e) => {
 		e.preventDefault()
 		const { top, left } = e.target.getBoundingClientRect()
@@ -62,42 +62,51 @@ function Touch(div, deadzone) {
 	}
 	const moveTouch = (e, secound) => {
 		touch = true;
-		if (secound && startMoveSecound == null) {
-			touchSecound = true;
-			startMoveSecound = { x: secound.x, y: secound.y }
-			thisMoveSecound = { x: secound.x, y: secound.y }
-		}
-		if (!secound && startMoveSecound) {
-			touchSecound = false;
-			startMoveSecound = null
-			thisMoveSecound = null
-		}
 		if (startMove == null) {
 			startMove = { x: e.x, y: e.y }
 			thisMove = { x: e.x, y: e.y }
 			this.triger('start', thisMove)
 			click = true
-		} else {
+			return;
+		}
+		if (secound && startMoveSecound == null) {
+			touchSecound = true;
+			if (distance2d(startMove, secound) < distance2d(startMove, e)) {
+				//switched touches
+				startMove = { x: e.x, y: e.y };
+				thisMove = { x: e.x, y: e.y };
+			}
+			startMoveSecound = { x: secound.x, y: secound.y }
+			thisMoveSecound = { x: secound.x, y: secound.y }
+			return;
+		}
+		if (!secound && startMoveSecound) {
+			touchSecound = false;
+			startMoveSecound = null
+			thisMoveSecound = null
+			return;
+		}
 
-			const delta = getDelta(thisMove, e, thisMoveSecound, secound)
-			const deltaZoom = getZoom(thisMove, e, thisMoveSecound, secound)
-			thisMove = { x: e.x, y: e.y }
-			thisMoveSecound = secound ? { x: secound.x, y: secound.y } : null
-			const direction = getDelta(startMove, thisMove, startMoveSecound, thisMoveSecound)
-			const zoom = getZoom(startMove, thisMove, startMoveSecound, thisMoveSecound)
-			this.triger('force', {
-				delta,
-				direction,
-				startPosition: startMove,
-				position: thisMove,
-				distance: distance2d(startMove, thisMove),
-				click,
-				mouseDown,
-				zoom,
-				deltaZoom,
-				touchSecound,
-				isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
-				debug: this.debug && `${startMove && 'Start: ' + JSON.stringify(startMove)},
+
+		const delta = getDelta(thisMove, e, thisMoveSecound, secound)
+		const deltaZoom = getZoom(thisMove, e, thisMoveSecound, secound)
+		thisMove = { x: e.x, y: e.y }
+		thisMoveSecound = secound ? { x: secound.x, y: secound.y } : null
+		const direction = getDelta(startMove, thisMove, startMoveSecound, thisMoveSecound)
+		const zoom = getZoom(startMove, thisMove, startMoveSecound, thisMoveSecound)
+		this.triger('force', {
+			delta,
+			direction,
+			startPosition: startMove,
+			position: thisMove,
+			distance: distance2d(startMove, thisMove),
+			click,
+			mouseDown,
+			zoom,
+			deltaZoom,
+			touchSecound,
+			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
+			debug: this.debug && `${startMove && 'Start: ' + JSON.stringify(startMove)},
 ${thisMove && 'This: ' + JSON.stringify(thisMove)}, 
 ${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
 ${thisMoveSecound && 'Start this: ' + JSON.stringify(thisMoveSecound)},
@@ -105,39 +114,40 @@ ${delta && 'Delta: ' + JSON.stringify(delta)},
 ${'Zoom: ' + zoom},
 ${'DZoom: ' + deltaZoom}
 ${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
-${last_error}`
-			})
-			if (distance2d(startMove, thisMove) > this.deadzone) {
-				click = false
-				if (Math.abs(direction.x) > Math.abs(direction.y)) {
-					if (direction.x > 0) {
-						this.triger('left')
-					} else {
-						this.triger('right')
-					}
-				} else if (direction.y > 0) {
-					this.triger('down')
+${this.last_error}`
+		})
+		if (distance2d(startMove, thisMove) > this.deadzone) {
+			click = false
+			if (Math.abs(direction.x) > Math.abs(direction.y)) {
+				if (direction.x > 0) {
+					this.triger('left')
 				} else {
-					this.triger('up')
+					this.triger('right')
 				}
+			} else if (direction.y > 0) {
+				this.triger('down')
+			} else {
+				this.triger('up')
 			}
 		}
 	}
 	//= {up:[],down:[],left:[],right:[],stop:[],click:[],force:[]}
 	const stopTouch = (e) => {
 		e.preventDefault()
+		console.log(e)
 		if (touch == false) {
 			return
 		}
 		touch = false
 		touchSecound = false;
+		let saveMove = startMove;
 
 		if (click) {
 			if (e.button) {
 				if (e.button === 1) this.triger('bmiddle')
 				if (e.button === 2) this.triger('bright')
-			} else if (startMove) {
-				this.triger('click', startMove)
+			} else if (saveMove) {
+				this.triger('click', saveMove)
 			}
 		}
 		const delta = { x: 0, y: 0 }
@@ -228,7 +238,11 @@ Touch.prototype.triger = function (ev, args) {
 			}
 			catch (e) {
 				console.log(e)
-				last_error = 'Error: ' + e
+				this.last_error = 'Error: ' + e.name +
+					' ' + e.foo +
+					' ' + e.message +
+					' ' + e.stack
+				//if (this.debug) throw e
 			}
 		})
 }

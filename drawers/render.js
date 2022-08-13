@@ -12,6 +12,7 @@ function Renderer(color, stroke) {
 function RenderEngine(context, manager) {
 	this.context = context
 	this.manager = manager
+	this.maxSize = 100
 }
 
 function shapeDone(context, renderer) {
@@ -33,12 +34,13 @@ RenderEngine.prototype.draw = function (view) {
 	const { x: centerX, y: centerY, scale } = view
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
-	const points = this.manager.getEnities(Renderer).map(
+	const maxSize = this.maxSize * scale;
+	this.manager.getEnities(Renderer).map(
 		(elem) => {
 			var transform = this.manager.get(Transform, elem)[0]
 			var x = (transform.positions[0] - centerX) * scale + canvasWidthHalf
 			var y = (transform.positions[1] - centerY) * scale + canvasHeightHalf
-			if (x < 0 || y < 0 || x > canvasWidth || y > canvasHeight)
+			if (x < -maxSize || y < -maxSize || x > canvasWidth || y > canvasHeight)
 				return
 			var renderers = this.manager.get(Renderer, elem)[0]
 
