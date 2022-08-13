@@ -36,18 +36,28 @@ function Touch(div, deadzone) {
 	let click = true;
 	let touch = false;
 	let touchSecound = false;
+	this.mousePosition = { x: 0, y: 0 };
+	this.debug = false;
+	let last_error = ''
 	const moveTouchT = (e) => {
 		e.preventDefault()
 		const { top, left } = e.target.getBoundingClientRect()
-		if (e.touches[1])
-			return moveTouch({ x: e.touches[0].clientX - left, y: e.touches[0].clientY - top }
-				, { x: e.touches[1].clientX - left, y: e.touches[1].clientY - top })
-		if (e.touches[0])
-			return moveTouch({ x: e.touches[0].clientX - left, y: e.touches[0].clientY - top })
+		if (e.touches[1] && e.touches[0]) {
+			let first = { x: e.touches[0].clientX - left, y: e.touches[0].clientY - top }
+			let secound = { x: e.touches[1].clientX - left, y: e.touches[1].clientY - top }
+			this.mousePosition = { x: (first.x + secound.x) / 2, y: (first.y + secound.y) / 2 }
+			return moveTouch(first, secound)
+		}
+		if (e.touches[0]) {
+			let first = { x: e.touches[0].clientX - left, y: e.touches[0].clientY - top }
+			this.mousePosition = { x: first.x, y: first.y }
+			return moveTouch(first)
+		}
 	}
 	const moveTouchM = (e) => {
 		e.preventDefault()
 		const { top, left } = e.target.getBoundingClientRect()
+		this.mousePosition = { x: e.clientX - left, y: e.clientY - top }
 		if (mouseDown) moveTouch({ x: e.clientX - left, y: e.clientY - top })
 	}
 	const moveTouch = (e, secound) => {
@@ -86,14 +96,16 @@ function Touch(div, deadzone) {
 				zoom,
 				deltaZoom,
 				touchSecound,
-				isPrimary: (!touchSecound && mouseDown == 0) || mouseDown == 1
-				// debug: `${startMove && JSON.stringify(startMove)},
-				// ${startMove && JSON.stringify(thisMove)}, 
-				// ${startMoveSecound && JSON.stringify(startMoveSecound)}, 
-				// ${thisMoveSecound && JSON.stringify(thisMoveSecound)},
-				// ${zoom},
-				// ${deltaZoom}
-				// `
+				isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
+				debug: this.debug && `${startMove && 'Start: ' + JSON.stringify(startMove)},
+${thisMove && 'This: ' + JSON.stringify(thisMove)}, 
+${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
+${thisMoveSecound && 'Start this: ' + JSON.stringify(thisMoveSecound)},
+${delta && 'Delta: ' + JSON.stringify(delta)},
+${'Zoom: ' + zoom},
+${'DZoom: ' + deltaZoom}
+${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
+${last_error}`
 			})
 			if (distance2d(startMove, thisMove) > this.deadzone) {
 				click = false
@@ -118,7 +130,8 @@ function Touch(div, deadzone) {
 			return
 		}
 		touch = false
-		touchSecound = false
+		touchSecound = false;
+
 		if (click) {
 			if (e.button) {
 				if (e.button === 1) this.triger('bmiddle')
@@ -210,7 +223,13 @@ Touch.prototype.clear = function () {
 Touch.prototype.triger = function (ev, args) {
 	if (this.events[ev])
 		this.events[ev].forEach(func => {
-			func(args)
+			try {
+				func(args)
+			}
+			catch (e) {
+				console.log(e)
+				last_error = 'Error: ' + e
+			}
 		})
 }
 
