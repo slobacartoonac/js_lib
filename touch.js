@@ -163,6 +163,8 @@ function Touch(div, deadzone) {
 		${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
 		${this.last_error}`
 		const addition = {
+			x: startPosition.x,
+			y: startPosition.y,
 			delta,
 			direction,
 			startPosition,
