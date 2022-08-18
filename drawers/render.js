@@ -5,9 +5,10 @@ import { ShapeText } from '../shapes/text.js'
 import { Sprite } from '../shapes/sprite.js'
 import { ShapeRounded } from '../shapes/rounded-box.js'
 
-function Renderer(color, stroke) {
+function Renderer(color, stroke, layer) {
 	this.color = color
 	this.stroke = stroke
+	this.layer = layer || 0
 }
 
 function RenderEngine(context, manager) {
@@ -48,21 +49,34 @@ RenderEngine.prototype.draw = function (view) {
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
 	const maxSize = this.maxSize * scale;
-	this.manager.getEnities(Renderer).map(
-		(elem) => {
+	this.manager.getEnities(Renderer).map(elem => {
+		var renderer = this.manager.get(Renderer, elem)[0]
+		return [elem, renderer]
+	}).sort(([, a], [, b]) => {
+		if (a.layer < b.layer) {
+			return -1;
+		}
+		if (a.layer > b.layer) {
+			return 1;
+		}
+		// a must be equal to b
+		return 0;
+	}
+	).map(
+		([elem, renderer]) => {
 			var transform = this.manager.get(Transform, elem)[0]
 			var x = (transform.positions[0] - centerX) * scale + canvasWidthHalf
 			var y = (transform.positions[1] - centerY) * scale + canvasHeightHalf
 			if (x < -maxSize || y < -maxSize || x > canvasWidth || y > canvasHeight)
 				return
-			var renderers = this.manager.get(Renderer, elem)[0]
+
 			let circles = this.manager.get(ShapeCircle, elem)
 			for (let i in circles) {
 				let circle = circles[i];
 				const elementSize = circle.radius * scale > 1 ? circle.radius * scale : 1
 				context.beginPath()
 				context.arc(x, y, elementSize, 0, 2 * Math.PI, false)
-				shapeDone(context, renderers);
+				shapeDone(context, renderer);
 			}
 			let boxes = this.manager.get(ShapeBox, elem)
 			let rounded = this.manager.get(ShapeRounded, elem)
@@ -78,7 +92,7 @@ RenderEngine.prototype.draw = function (view) {
 					context.rect(x, y, size_x, size_y);
 				}
 
-				shapeDone(context, renderers);
+				shapeDone(context, renderer);
 			}
 			let sprites = this.manager.get(Sprite, elem)
 			for (let i in sprites) {
@@ -95,7 +109,7 @@ RenderEngine.prototype.draw = function (view) {
 			for (let i in texts) {
 				let text = texts[i]
 				const size_x = text.font * scale > 1 ? text.font * scale : 1
-				context.fillStyle = renderers.color;
+				context.fillStyle = renderer.color;
 				context.font = parseInt(size_x) + 'px serif';
 				context.fillText(text.text, x, y);
 			}
