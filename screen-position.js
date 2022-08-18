@@ -1,8 +1,10 @@
 import { Vector } from "./shapes/vector";
 
 // written by Slobodan Zivkovic slobacartoonac@gmail.com
-function ScreenPosition(screen, touch) {
+function ScreenPosition(screen, touch, width, height) {
     Vector.call(this)
+    this.width = width
+    this.height = height
     this.push(0, 0, 1)
     this.screen = screen;
     this.touch = touch;
@@ -20,6 +22,9 @@ ScreenPosition.prototype = Object.create(Vector.prototype)
 
 
 ScreenPosition.prototype.zoom = function (scaleFactor) {
+    if (this.scale * scaleFactor > 2 ||
+        this.scale * scaleFactor < 0.5
+    ) return;
     this.scale *= scaleFactor
     let scaleDiff = scaleFactor - 1
     let xOffset = (this.touch.mousePosition.x - this.screen.width / 2) * scaleDiff
@@ -29,8 +34,18 @@ ScreenPosition.prototype.zoom = function (scaleFactor) {
 }
 
 ScreenPosition.prototype.move = function (x, y) {
-    this.x -= x / this.scale
-    this.y -= y / this.scale
+    let difX = x / this.scale
+    let difY = y / this.scale
+    if (this.x - difX > 0 &&
+        this.x - difX < this.width) {
+        this.x -= difX
+    }
+    if (this.y - difY > 0 &&
+        this.y - difY < this.height
+    ) {
+        this.y -= difY
+    }
+
 }
 
 export { ScreenPosition }
