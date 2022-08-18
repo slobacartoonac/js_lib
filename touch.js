@@ -3,6 +3,10 @@ function distance2d(a, b) {
 	return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))
 }
 
+function len2d(a) {
+	return Math.sqrt(a.x * a.x + a.y * a.y)
+}
+
 function getDelta(p1, n1, p2, n2) {
 	if (!n2) {
 		return { x: n1.x - p1.x, y: n1.y - p1.y }
@@ -28,9 +32,9 @@ function getZoom(p1, n1, p2, n2) {
 function Touch(div, deadzone) {
 	this.deadzone = deadzone
 	this.clear()
-	let startMove = null
+	let startPosition = null
 	let startMoveSecound = null
-	let thisMove = null
+	let position = null
 	let thisMoveSecound = null
 	let mouseDown = 0;
 	let click = true;
@@ -62,21 +66,22 @@ function Touch(div, deadzone) {
 		this.mousePosition = { x: e.clientX - left, y: e.clientY - top }
 		if (mouseDown) moveTouch({ x: e.clientX - left, y: e.clientY - top })
 	}
+
 	const moveTouch = (e, secound) => {
 		touch = true;
-		if (startMove == null) {
-			startMove = { x: e.x, y: e.y }
-			thisMove = { x: e.x, y: e.y }
-			this.triger('start', thisMove)
+		if (startPosition == null) {
+			startPosition = { x: e.x, y: e.y }
+			position = { x: e.x, y: e.y }
+			this.triger('start', position)
 			click = true
 			return;
 		}
 		if (secound && startMoveSecound == null) {
 			touchSecound = true;
-			if (distance2d(startMove, secound) < distance2d(startMove, e)) {
+			if (distance2d(startPosition, secound) < distance2d(startPosition, e)) {
 				//switched touches
-				startMove = { x: e.x, y: e.y };
-				thisMove = { x: e.x, y: e.y };
+				startPosition = { x: e.x, y: e.y };
+				position = { x: e.x, y: e.y };
 			}
 			startMoveSecound = { x: secound.x, y: secound.y }
 			thisMoveSecound = { x: secound.x, y: secound.y }
@@ -90,46 +95,50 @@ function Touch(div, deadzone) {
 		}
 
 
-		const delta = getDelta(thisMove, e, thisMoveSecound, secound)
-		const deltaZoom = getZoom(thisMove, e, thisMoveSecound, secound)
-		thisMove = { x: e.x, y: e.y }
+		let delta = getDelta(position, e, thisMoveSecound, secound)
+		let deltaZoom = getZoom(position, e, thisMoveSecound, secound)
+		position = { x: e.x, y: e.y }
 		thisMoveSecound = secound ? { x: secound.x, y: secound.y } : null
-		const direction = getDelta(startMove, thisMove, startMoveSecound, thisMoveSecound)
-		const zoom = getZoom(startMove, thisMove, startMoveSecound, thisMoveSecound)
-		this.triger('force', {
+		let direction = getDelta(startPosition, position, startMoveSecound, thisMoveSecound)
+		let zoom = getZoom(startPosition, position, startMoveSecound, thisMoveSecound)
+		let distance = len2d(direction)
+		let debug = this.debug && `${startPosition && 'Start: ' + JSON.stringify(startPosition)},
+		${position && 'This: ' + JSON.stringify(position)}, 
+		${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
+		${thisMoveSecound && 'Start this: ' + JSON.stringify(thisMoveSecound)},
+		${delta && 'Delta: ' + JSON.stringify(delta)},
+		${'Zoom: ' + zoom},
+		${'DZoom: ' + deltaZoom}
+		${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
+		${this.last_error}`
+		let addition = {
 			delta,
 			direction,
-			startPosition: startMove,
-			position: thisMove,
-			distance: distance2d(startMove, thisMove),
+			startPosition,
+			position,
+			distance,
 			click,
 			mouseDown,
 			zoom,
 			deltaZoom,
 			touchSecound,
 			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
-			debug: this.debug && `${startMove && 'Start: ' + JSON.stringify(startMove)},
-${thisMove && 'This: ' + JSON.stringify(thisMove)}, 
-${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
-${thisMoveSecound && 'Start this: ' + JSON.stringify(thisMoveSecound)},
-${delta && 'Delta: ' + JSON.stringify(delta)},
-${'Zoom: ' + zoom},
-${'DZoom: ' + deltaZoom}
-${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
-${this.last_error}`
-		})
-		if (distance2d(startMove, thisMove) > this.deadzone) {
+			debug
+		}
+
+		this.triger('force', addition)
+		if (distance > this.deadzone) {
 			click = false
 			if (Math.abs(direction.x) > Math.abs(direction.y)) {
 				if (direction.x > 0) {
-					this.triger('left')
+					this.triger('right', addition)
 				} else {
-					this.triger('right')
+					this.triger('left', addition)
 				}
 			} else if (direction.y > 0) {
-				this.triger('down')
+				this.triger('down', addition)
 			} else {
-				this.triger('up')
+				this.triger('up', addition)
 			}
 		}
 	}
@@ -139,40 +148,49 @@ ${this.last_error}`
 		if (touch == false) {
 			return
 		}
+		let delta = { x: 0, y: 0 }
+		let deltaZoom = 0
+		let direction = getDelta(startPosition, position, startMoveSecound, thisMoveSecound)
+		let zoom = getZoom(startPosition, position, startMoveSecound, thisMoveSecound)
+		let distance = len2d(direction)
+		let debug = this.debug && `${startPosition && 'Start: ' + JSON.stringify(startPosition)},
+		${position && 'This: ' + JSON.stringify(position)}, 
+		${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
+		${thisMoveSecound && 'Start this: ' + JSON.stringify(thisMoveSecound)},
+		${delta && 'Delta: ' + JSON.stringify(delta)},
+		${'Zoom: ' + zoom},
+		${'DZoom: ' + deltaZoom}
+		${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
+		${this.last_error}`
+		const addition = {
+			delta,
+			direction,
+			startPosition,
+			position,
+			distance,
+			click,
+			mouseDown,
+			zoom,
+			deltaZoom,
+			touchSecound,
+			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
+			debug
+		}
 		touch = false
 		touchSecound = false;
-		let saveMove = startMove;
+		let saveMove = startPosition;
 
 		if (click) {
 			if (e.button) {
-				if (e.button === 1) this.triger('bmiddle')
-				if (e.button === 2) this.triger('bright')
+				if (e.button === 1) this.triger('bmiddle', addition)
+				if (e.button === 2) this.triger('bright', addition)
 			} else if (saveMove) {
-				this.triger('click', saveMove)
+				this.triger('click', addition)
 			}
 		}
-		const delta = { x: 0, y: 0 }
-		let direction = { x: 0, y: 0 }
-		let distance = 0
-		if (thisMove && startMove) {
-			direction = {
-				x: thisMove.x - startMove.x,
-				y: thisMove.y - startMove.y,
-			}
-			distance = distance2d(startMove, thisMove)
-		}
-
-		this.triger('stop', {
-			delta,
-			direction,
-			startPosition: startMove,
-			position: thisMove,
-			distance,
-			click,
-			mouseDown
-		})
-		startMove = null
-		thisMove = null
+		this.triger('stop', addition)
+		startPosition = null
+		position = null
 		startMoveSecound = null
 		thisMoveSecound = null
 		mouseDown = 0
@@ -208,6 +226,18 @@ Touch.prototype.onForce = function (func) {
 }
 Touch.prototype.onStop = function (func) {
 	this.events.stop.push(func)
+}
+Touch.prototype.onUp = function (func) {
+	this.events.up.push(func)
+}
+Touch.prototype.onDown = function (func) {
+	this.events.down.push(func)
+}
+Touch.prototype.onLeft = function (func) {
+	this.events.left.push(func)
+}
+Touch.prototype.onRight = function (func) {
+	this.events.right.push(func)
 }
 
 Touch.prototype.unsub = function (ev, func) {

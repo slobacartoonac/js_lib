@@ -43,6 +43,7 @@ Vector.prototype.add = function (toAdd) {
 		}
 		this[k] += toAdd[k]
 	}
+	return this
 }
 
 export { Vector }
