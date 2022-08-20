@@ -45,5 +45,14 @@ Vector.prototype.add = function (toAdd) {
 	}
 	return this
 }
+Vector.prototype.negate = function () {
+	for (var k = 0; k < this.length; k++) {
+		this[k] = -this[k]
+	}
+	return this
+}
+Vector.prototype.substract = function (toAdd) {
+	return this.add(toAdd.negate())
+}
 
 export { Vector }

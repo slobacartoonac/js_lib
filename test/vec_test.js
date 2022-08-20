@@ -54,6 +54,13 @@ describe('Shape vector', function () {
 		assert.equal(v7.x, 6)
 		assert.equal(v7.y, 8)
 	})
+	it('substract vectors', function () {
+		var v71 = new Vector([4, 4])
+		var v81 = new Vector([3, 5])
+		v71.substract(v81)
+		assert.equal(v71.x, 1)
+		assert.equal(v71.y, -1)
+	})
 	it('add different vectors', function () {
 		var v9 = new Vector([3, 4])
 		var v10 = new Vector([3])
