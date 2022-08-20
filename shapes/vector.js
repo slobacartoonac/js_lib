@@ -1,7 +1,13 @@
 function Vector(...array) {
 	Array.call(this)
 	if (array.length == 1) {
-		this.push(...Object.values(array[0]))
+		var item = array[0]
+		var arr = Object.values(item)
+		if (Object.hasOwnProperty.call(item, 'length') &&
+			item.length !== arr.length) {
+			arr.pop()
+		}
+		this.push(...arr)
 	} else {
 		this.push(...Object.values(array))
 	}
@@ -33,23 +39,29 @@ function Vector(...array) {
 }
 
 Vector.prototype = Object.create(Array.prototype)
+
 Vector.prototype.add = function (toAdd) {
-	for (var k = 0; k < this.length; k++) {
-		if (!Object.hasOwnProperty.call(this, k)) {
-			break;
+	let ret = new Vector(this)
+	for (var k = 0; k < ret.length; k++) {
+		if (!Object.hasOwnProperty.call(ret, k)) {
+			continue;
 		}
 		if (!Object.hasOwnProperty.call(toAdd, k)) {
-			break;
+			continue;
 		}
-		this[k] += toAdd[k]
+		ret[k] += toAdd[k]
 	}
-	return this
+	return ret
 }
 Vector.prototype.negate = function () {
-	for (var k = 0; k < this.length; k++) {
-		this[k] = -this[k]
+	let ret = new Vector(this)
+	for (var k = 0; k < ret.length; k++) {
+		if (!Object.hasOwnProperty.call(ret, k)) {
+			continue;
+		}
+		ret[k] = -ret[k]
 	}
-	return this
+	return ret
 }
 Vector.prototype.substract = function (toAdd) {
 	return this.add(toAdd.negate())
