@@ -1,5 +1,5 @@
 var assert = require('assert')
-import { Adjust } from '../adjust'
+import { Adjust } from '../fe/adjust'
 
 describe('Adjust tests', function () {
     it('Subscribe then publish', function () {

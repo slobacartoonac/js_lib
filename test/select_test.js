@@ -1,5 +1,5 @@
 var assert = require('assert')
-const { default: Select } = require('../select')
+const { default: Select } = require('../fe/select')
 
 var points = [[10, 10], [50, 8], [20, 60], [80, 50], [70, 100], [75, 0]]
 

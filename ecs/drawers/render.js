@@ -1,9 +1,9 @@
 import { Transform } from '../physics/transform.js'
-import { ShapeBox } from '../shapes/box.js'
-import { ShapeCircle } from '../shapes/circle.js'
-import { ShapeText } from '../shapes/text.js'
-import { Sprite } from '../shapes/sprite.js'
-import { ShapeRounded } from '../shapes/rounded-box.js'
+import { ShapeBox } from '../../shapes/box.js'
+import { ShapeCircle } from '../../shapes/circle.js'
+import { ShapeText } from '../../shapes/text.js'
+import { Sprite } from '../../shapes/sprite.js'
+import { ShapeRounded } from '../../shapes/rounded-box.js'
 
 function Renderer(color, stroke, layer) {
 	this.color = color

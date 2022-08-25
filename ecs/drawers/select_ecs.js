@@ -1,4 +1,4 @@
-import { ShapeCircle } from '../shapes/circle.js'
+import { ShapeCircle } from '../../shapes/circle.js'
 import { Transform } from '../physics/transform.js'
 
 function Selectable() {

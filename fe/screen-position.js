@@ -1,4 +1,4 @@
-import { Vector } from "./shapes/vector";
+import { Vector } from "../shapes/vector";
 
 // written by Slobodan Zivkovic slobacartoonac@gmail.com
 function ScreenPosition(screen, touch, width, height) {
