@@ -32,10 +32,9 @@ ScreenPosition.prototype.zoom = function (scaleFactor) {
         return
     }
     let scaleDiff = scaleFactor - 1
-    let xOffset = (this.touch.mousePosition.x - this.screen.width / 2) * scaleDiff
-    let yOffset = (this.touch.mousePosition.y - this.screen.height / 2) * scaleDiff
-    this.x += xOffset / this.scale
-    this.y += yOffset / this.scale
+    let xOffset = (this.screen.width / 2 - this.touch.mousePosition.x) * scaleDiff
+    let yOffset = (this.screen.height / 2 - this.touch.mousePosition.y) * scaleDiff
+    this.move(xOffset, yOffset)
 }
 
 ScreenPosition.prototype.move = function (x, y) {
