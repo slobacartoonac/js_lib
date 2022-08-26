@@ -111,7 +111,7 @@ RenderEngine.prototype.draw = function (view) {
 				const size_x = text.font * scale > 1 ? text.font * scale : 1
 				context.fillStyle = renderer.color;
 				context.font = parseInt(size_x) + 'px serif';
-				context.fillText(text.text, x, y);
+				context.fillText(text.text, x, y + parseInt(size_x));
 			}
 		}
 	)
