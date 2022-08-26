@@ -1,10 +1,15 @@
 import { Vector } from "../shapes/vector";
 
 // written by Slobodan Zivkovic slobacartoonac@gmail.com
-function ScreenPosition(screen, touch, width, height) {
+function ScreenPosition(screen, touch, {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    minScale,
+    maxScale,
+}) {
     Vector.call(this)
-    this.width = width
-    this.height = height
     this.push(0, 0, 1)
     this.screen = screen;
     this.touch = touch;
@@ -16,16 +21,27 @@ function ScreenPosition(screen, touch, width, height) {
             this[2] = value;
         }
     });
+    Object.assign(this, {
+        minX,
+        minY,
+        maxX,
+        maxY,
+        minScale,
+        maxScale,
+    })
 }
 
 ScreenPosition.prototype = Object.create(Vector.prototype)
 
 
 ScreenPosition.prototype.zoom = function (scaleFactor) {
-    if (this.scale * scaleFactor > 2 ||
-        this.scale * scaleFactor < 0.5
-    ) return;
     this.scale *= scaleFactor
+    if (!isNan(this.minScale) && this.scale < this.minScale) {
+        this.scale = this.minScale
+    }
+    if (!isNan(this.maxScale) && this.scale > this.maxScale) {
+        this.scale = this.maxScale
+    }
     let scaleDiff = scaleFactor - 1
     let xOffset = (this.touch.mousePosition.x - this.screen.width / 2) * scaleDiff
     let yOffset = (this.touch.mousePosition.y - this.screen.height / 2) * scaleDiff
@@ -36,16 +52,20 @@ ScreenPosition.prototype.zoom = function (scaleFactor) {
 ScreenPosition.prototype.move = function (x, y) {
     let difX = x / this.scale
     let difY = y / this.scale
-    if (this.x - difX > 0 &&
-        this.x - difX < this.width) {
-        this.x -= difX
+    this.x -= difX
+    this.y -= difY
+    if (!isNan(this.minX) && this.x < this.minX) {
+        this.x = this.minX
     }
-    if (this.y - difY > 0 &&
-        this.y - difY < this.height
-    ) {
-        this.y -= difY
+    if (!isNan(this.maxX) && this.x > this.maxX) {
+        this.x = this.maxX
     }
-
+    if (!isNan(this.minY) && this.y < this.minY) {
+        this.y = this.minY
+    }
+    if (!isNan(this.maxY) && this.y > this.maxY) {
+        this.y = this.maxY
+    }
 }
 
 export { ScreenPosition }
