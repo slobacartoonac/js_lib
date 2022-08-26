@@ -25,9 +25,11 @@ ScreenPosition.prototype.zoom = function (scaleFactor) {
     this.scale *= scaleFactor
     if (!isNaN(this.minScale) && this.scale < this.minScale) {
         this.scale = this.minScale
+        return
     }
     if (!isNaN(this.maxScale) && this.scale > this.maxScale) {
         this.scale = this.maxScale
+        return
     }
     let scaleDiff = scaleFactor - 1
     let xOffset = (this.touch.mousePosition.x - this.screen.width / 2) * scaleDiff
