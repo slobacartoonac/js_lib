@@ -38,6 +38,10 @@ function Vector(...array) {
 	});
 }
 
+Vector.prototype.x = 0;
+Vector.prototype.y = 0;
+Vector.prototype.z = 0;
+
 Vector.prototype = Object.create(Array.prototype)
 
 Vector.prototype.add = function (toAdd) {
