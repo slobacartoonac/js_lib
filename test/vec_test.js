@@ -76,6 +76,17 @@ describe('Shape vector', function () {
 		var res = v11.add(v12)
 		assert.equal(res.x, 6)
 	})
+	it('test magnitude', function () {
+		var v13 = new Vector([4, 3])
+		var magnitude = v13.magnitude()
+		assert.equal(magnitude, 5)
+	})
+	it('test normalise', function () {
+		var v13 = new Vector([3, 2])
+		var res = v13.normalise()
+		assert.ok(Math.abs((res.x * v13.magnitude() - v13.x)) < Number.EPSILON)
+		assert.ok(Math.abs((res.y * v13.magnitude() - v13.y)) < Number.EPSILON)
+	})
 })
 
 describe('Point in triangle', function () {

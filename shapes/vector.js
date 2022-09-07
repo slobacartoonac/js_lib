@@ -70,5 +70,26 @@ Vector.prototype.negate = function () {
 Vector.prototype.substract = function (toAdd) {
 	return this.add(toAdd.negate())
 }
+Vector.prototype.magnitude = function () {
+	let magnitude = 0;
+	for (var k = 0; k < this.length; k++) {
+		if (!Object.hasOwnProperty.call(this, k)) {
+			continue;
+		}
+		magnitude += this[k] * this[k]
+	}
+	return Math.sqrt(magnitude);
+}
+Vector.prototype.normalise = function (toAdd) {
+	let ret = new Vector(this)
+	let magnitude = this.magnitude()
+	for (var k = 0; k < ret.length; k++) {
+		if (!Object.hasOwnProperty.call(ret, k)) {
+			continue;
+		}
+		ret[k] /= magnitude
+	}
+	return ret
+}
 
 export { Vector }
