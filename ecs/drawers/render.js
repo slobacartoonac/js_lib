@@ -4,6 +4,7 @@ import { ShapeCircle } from '../../shapes/circle.js'
 import { ShapeText } from '../../shapes/text.js'
 import { Sprite } from '../../shapes/sprite.js'
 import { ShapeRounded } from '../../shapes/rounded-box.js'
+import { TransformRotate } from '../physics/transformRotate.js'
 
 function Renderer(color, stroke, layer) {
 	this.color = color
@@ -80,10 +81,17 @@ RenderEngine.prototype.draw = function (view) {
 			}
 			let boxes = this.manager.get(ShapeBox, elem)
 			let rounded = this.manager.get(ShapeRounded, elem)
+			let rotate = this.manager.get(TransformRotate, elem)[0]
 			for (let i in boxes) {
 				let box = boxes[i];
 				const size_x = box.x * scale > 1 ? box.x * scale : 1
 				const size_y = box.y * scale > 1 ? box.y * scale : 1
+				context.save();
+				if (rotate) {
+					context.translate(x + size_x / 2, y + size_y / 2);
+					context.rotate(rotate.rotate);
+					context.translate(-x - size_x / 2, -y - size_y / 2);
+				}
 				context.beginPath();
 				if (rounded[0]) {
 					roundedRect(context, x, y, size_x, size_y, rounded[0].radius)
@@ -91,8 +99,8 @@ RenderEngine.prototype.draw = function (view) {
 				else {
 					context.rect(x, y, size_x, size_y);
 				}
-
 				shapeDone(context, renderer);
+				context.restore();
 			}
 			let sprites = this.manager.get(Sprite, elem)
 			for (let i in sprites) {
@@ -103,15 +111,29 @@ RenderEngine.prototype.draw = function (view) {
 				}
 				const size_x = box.x * scale > 1 ? box.x * scale : 1
 				const size_y = box.y * scale > 1 ? box.y * scale : 1
+				context.save();
+				if (rotate) {
+					context.translate(x + size_x / 2, y + size_y / 2);
+					context.rotate(rotate.rotate);
+					context.translate(-x - size_x / 2, -y - size_y / 2);
+				}
 				context.drawImage(sprite.image, x, y, size_x, size_y);
+				context.restore();
 			}
 			let texts = this.manager.get(ShapeText, elem)
 			for (let i in texts) {
 				let text = texts[i]
-				const size_x = text.font * scale > 1 ? text.font * scale : 1
+				const size_y = text.font * scale > 1 ? text.font * scale : 1
 				context.fillStyle = renderer.color;
-				context.font = parseInt(size_x) + 'px serif';
-				context.fillText(text.text, x, y + parseInt(size_x));
+				context.font = parseInt(size_y) + 'px serif';
+				context.save();
+				if (rotate) {
+					context.translate(x, y);
+					context.rotate(rotate.rotate);
+					context.translate(-x, -y);
+				}
+				context.fillText(text.text, x, y + parseInt(size_y));
+				context.restore();
 			}
 		}
 	)
