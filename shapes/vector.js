@@ -81,13 +81,16 @@ Vector.prototype.magnitude = function () {
 	return Math.sqrt(magnitude);
 }
 Vector.prototype.normalise = function (toAdd) {
-	let ret = new Vector(this)
 	let magnitude = this.magnitude()
+	return this.scale(1 / magnitude)
+}
+Vector.prototype.scale = function (scale) {
+	let ret = new Vector(this)
 	for (var k = 0; k < ret.length; k++) {
 		if (!Object.hasOwnProperty.call(ret, k)) {
 			continue;
 		}
-		ret[k] /= magnitude
+		ret[k] *= scale
 	}
 	return ret
 }

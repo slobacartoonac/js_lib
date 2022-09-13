@@ -76,6 +76,11 @@ describe('Shape vector', function () {
 		var res = v11.add(v12)
 		assert.equal(res.x, 6)
 	})
+	it('scale vector', function () {
+		var res = new Vector([3, 4]).scale(2)
+		assert.equal(res.x, 6)
+		assert.equal(res.y, 8)
+	})
 	it('test magnitude', function () {
 		var v13 = new Vector([4, 3])
 		var magnitude = v13.magnitude()
