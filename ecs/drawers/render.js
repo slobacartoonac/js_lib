@@ -109,8 +109,8 @@ RenderEngine.prototype.draw = function (view) {
 				if (!box) {
 					break;
 				}
-				const size_x = box.x * scale > 1 ? box.x * scale : 1
-				const size_y = box.y * scale > 1 ? box.y * scale : 1
+				const size_x = box.x * scale > 1 ? box.x * scale + 0.5 : 1
+				const size_y = box.y * scale > 1 ? box.y * scale + 0.5 : 1
 				context.save();
 				if (rotate) {
 					context.translate(x + size_x / 2, y + size_y / 2);
