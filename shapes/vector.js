@@ -45,7 +45,7 @@ Vector.prototype.z = 0;
 Vector.prototype = Object.create(Array.prototype)
 
 Vector.prototype.add = function (toAdd) {
-	let ret = new Vector(this)
+	let ret = this.copy()
 	for (var k = 0; k < ret.length; k++) {
 		if (!Object.hasOwnProperty.call(ret, k)) {
 			continue;
@@ -58,7 +58,7 @@ Vector.prototype.add = function (toAdd) {
 	return ret
 }
 Vector.prototype.negate = function () {
-	let ret = new Vector(this)
+	let ret = this.copy()
 	for (var k = 0; k < ret.length; k++) {
 		if (!Object.hasOwnProperty.call(ret, k)) {
 			continue;
@@ -85,7 +85,7 @@ Vector.prototype.normalise = function (toAdd) {
 	return this.scale(1 / magnitude)
 }
 Vector.prototype.scale = function (scale) {
-	let ret = new Vector(this)
+	let ret = this.copy()
 	for (var k = 0; k < ret.length; k++) {
 		if (!Object.hasOwnProperty.call(ret, k)) {
 			continue;
@@ -93,6 +93,10 @@ Vector.prototype.scale = function (scale) {
 		ret[k] *= scale
 	}
 	return ret
+}
+
+Vector.prototype.copy = function () {
+	return new Vector(this)
 }
 
 export { Vector }
