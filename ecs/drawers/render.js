@@ -46,10 +46,16 @@ RenderEngine.prototype.draw = function (view) {
 	const { context } = this
 	var canvasWidth = context.canvas.clientWidth
 	var canvasHeight = context.canvas.clientHeight
-	const { x: centerX, y: centerY, scale } = view
+	const { x: centerX, y: centerY, scale, angle } = view
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
 	const maxSize = this.maxSize * scale;
+	if (angle) {
+		context.save();
+		context.translate(canvasWidthHalf, canvasHeightHalf);
+		context.rotate(angle);
+		context.translate(-canvasWidthHalf, -canvasHeightHalf);
+	}
 	this.manager.getEnities(Renderer).map(elem => {
 		var renderer = this.manager.get(Renderer, elem)[0]
 		return [elem, renderer]
@@ -137,6 +143,9 @@ RenderEngine.prototype.draw = function (view) {
 			}
 		}
 	)
+	if (angle) {
+		context.restore()
+	}
 }
 RenderEngine.prototype.mesure = function (text) {
 	const { context } = this
