@@ -29,6 +29,21 @@ function getZoom(p1, n1, p2, n2) {
 		return newDistance / initialDistance
 }
 
+function getAngleDelta(p1, n1, p2, n2) {
+	if (!n2) {
+		return 0
+	}
+	let angle1 = getAngle(p1, p2)
+	let angle2 = getAngle(n1, n2)
+	return angle2 - angle1
+}
+
+function getAngle(p1, n1) {
+	let delta = getDelta(p1, n1)
+	let angle = Math.atan2(delta.y, delta.x)
+	return angle
+}
+
 function Touch(div, deadzone) {
 	this.deadzone = deadzone
 	this.clear()
@@ -97,11 +112,13 @@ function Touch(div, deadzone) {
 
 		let delta = getDelta(position, e, thisMoveSecound, secound)
 		let deltaZoom = getZoom(position, e, thisMoveSecound, secound)
+		let deltaAngle = getAngleDelta(position, e, thisMoveSecound, secound)
 		position = { x: e.x, y: e.y }
 		thisMoveSecound = secound ? { x: secound.x, y: secound.y } : null
 		let direction = getDelta(startPosition, position, startMoveSecound, thisMoveSecound)
 		let zoom = getZoom(startPosition, position, startMoveSecound, thisMoveSecound)
 		let distance = len2d(direction)
+		let angle = getAngleDelta(startPosition, position, startMoveSecound, thisMoveSecound)
 		let debug = this.debug && `${startPosition && 'Start: ' + JSON.stringify(startPosition)},
 		${position && 'This: ' + JSON.stringify(position)}, 
 		${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
@@ -109,6 +126,8 @@ function Touch(div, deadzone) {
 		${delta && 'Delta: ' + JSON.stringify(delta)},
 		${'Zoom: ' + zoom},
 		${'DZoom: ' + deltaZoom}
+		${'Angle: ' + angle}
+		${'DAngle: ' + deltaAngle}
 		${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
 		${this.last_error}`
 		let addition = {
@@ -123,6 +142,8 @@ function Touch(div, deadzone) {
 			zoom,
 			deltaZoom,
 			touchSecound,
+			angle,
+			deltaAngle,
 			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
 			debug
 		}
@@ -151,8 +172,10 @@ function Touch(div, deadzone) {
 		}
 		let delta = { x: 0, y: 0 }
 		let deltaZoom = 0
+		let deltaAngle = 0
 		let direction = getDelta(startPosition, position, startMoveSecound, thisMoveSecound)
 		let zoom = getZoom(startPosition, position, startMoveSecound, thisMoveSecound)
+		let angle = getAngleDelta(startPosition, position, startMoveSecound, thisMoveSecound)
 		let distance = len2d(direction)
 		let debug = this.debug && `${startPosition && 'Start: ' + JSON.stringify(startPosition)},
 		${position && 'This: ' + JSON.stringify(position)}, 
@@ -161,6 +184,8 @@ function Touch(div, deadzone) {
 		${delta && 'Delta: ' + JSON.stringify(delta)},
 		${'Zoom: ' + zoom},
 		${'DZoom: ' + deltaZoom}
+		${'Angle: ' + angle}
+		${'DAngle: ' + deltaAngle}
 		${'isPrimary: ' + ((!touchSecound && mouseDown == 0) || mouseDown == 1)}
 		${this.last_error}`
 		const addition = {
@@ -177,6 +202,8 @@ function Touch(div, deadzone) {
 			zoom,
 			deltaZoom,
 			touchSecound,
+			angle,
+			deltaAngle,
 			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
 			debug
 		}
