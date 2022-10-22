@@ -103,7 +103,7 @@ Vector.prototype.scale = function (scale) {
 }
 
 Vector.prototype.copy = function () {
-	return new Vector(this)
+	return new this.constructor(this)
 }
 
 export { Vector }
