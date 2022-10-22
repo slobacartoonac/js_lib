@@ -42,7 +42,14 @@ Vector.prototype.x = 0;
 Vector.prototype.y = 0;
 Vector.prototype.z = 0;
 
-Vector.prototype = Object.create(Array.prototype)
+Vector.prototype = Object.create(Array.prototype, {
+	constructor: {
+		value: Vector,
+		enumerable: false, // Make it non-enumerable, so it won't appear in `for...in` loop
+		writable: true,
+		configurable: true,
+	}
+})
 
 Vector.prototype.add = function (toAdd) {
 	let ret = this.copy()

@@ -1,5 +1,6 @@
 var assert = require('assert')
 import { EntityManager } from '../ecs'
+import { Vector } from '../shapes/vector'
 
 describe('EntityManager', function () {
 	it('should create entity manager', function () {
@@ -91,5 +92,14 @@ describe('EntityManager', function () {
 		manager.asign(new ComponentB(2), entity1)
 		assert.equal(manager.getEnities(Component).length, 2)
 	})
+	it('it should add 1 component with Vector', function () {
+		var manager = new EntityManager()
+		var entity = manager.create()
+		var component = new Vector(5)
+		manager.asign(component, entity)
+		var component_array = manager.get(Vector, entity)
+		assert.equal(component_array.length, 1)
+	})
+
 })
 
