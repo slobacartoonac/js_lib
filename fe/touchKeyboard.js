@@ -17,10 +17,14 @@ function TouchKeyboard(div) {
     input.style.opacity = 0;
     input.size = 1;
     input.addEventListener('input', (e) => {
-        if ("" == e.target.value) {
+        this.triger("type", e.target.value)
+    }, false)
+
+    input.addEventListener('keydown', (event) => {
+        if (event.key === "Backspace" && input.value.length <= 1) {
+            this.triger("type", "")
             input.blur()
         }
-        this.triger("type", e.target.value)
     }, false)
     input.addEventListener("keypress", (event) => {
         // If the user presses the "Enter" key on the keyboard
@@ -51,6 +55,9 @@ TouchKeyboard.prototype.onClear = function (func) {
 }
 TouchKeyboard.prototype.focus = function () {
     this.input.focus()
+}
+TouchKeyboard.prototype.blur = function () {
+    this.input.blur()
 }
 
 TouchKeyboard.prototype.unsub = function (ev, func) {
