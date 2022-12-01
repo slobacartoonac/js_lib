@@ -17,6 +17,9 @@ function TouchKeyboard(div) {
     input.style.opacity = 0;
     input.size = 1;
     input.addEventListener('input', (e) => {
+        if ("" == e.target.value) {
+            input.blur()
+        }
         this.triger("type", e.target.value)
     }, false)
     input.addEventListener("keypress", (event) => {
