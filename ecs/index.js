@@ -45,8 +45,8 @@ EntityManager.prototype.alive = function (e) {
 }
 
 EntityManager.prototype.destroy = function (e) {
-	delete this._components[e.id]
-	delete this._entities[e.id]
+	this._components[e.id] = undefined
+	this._entities[e.id] = undefined
 	++this._generation[e.index()]
 	this._free_indices.push(e.index())
 }
