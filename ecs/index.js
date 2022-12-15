@@ -100,7 +100,7 @@ EntityManager.prototype.remove = function (component, e) {
 EntityManager.prototype.getEnities = function (c_type) {
 	return Object.values(this._entities).filter(
 		(entity) => {
-			return this.get(c_type, entity).length
+			return entity && this.get(c_type, entity).length
 		}
 	)
 }
