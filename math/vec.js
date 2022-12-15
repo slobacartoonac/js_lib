@@ -46,6 +46,10 @@ function interpolateVecs(vecA, vecB, over) {
     let left = 1 - over
     return { x: vecA.x * left + vecB.x * over, y: vecA.y * left + vecB.y * over }
 }
+function interpolate(vecA, vecB, over) {
+    let left = 1 - over
+    return vecA * left + vecB * over
+}
 
 export {
     pointInTriangle,
@@ -53,5 +57,6 @@ export {
     perpDot,
     lineCollision,
     sign,
-    interpolateVecs
+    interpolateVecs,
+    interpolate
 }

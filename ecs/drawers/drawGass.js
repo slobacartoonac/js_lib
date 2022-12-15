@@ -1,3 +1,5 @@
+import { interpolate } from '../../math/vec.js'
+import { ShapeCircle } from '../../shapes/circle.js'
 import { Physics } from '../physics/physics.js'
 import { Transform } from '../physics/transform'
 
@@ -10,17 +12,17 @@ const squareDistance = (point, nodeB) => {
 
 var COLORS = 16 * 16
 
-function MassPloter(context, manager) {
+function GassPloter(context, manager) {
 	this.context = context
 	this.update();
 	this.manager = manager
 }
 
-MassPloter.prototype.update = function () {
+GassPloter.prototype.update = function () {
 	this.img = this.context.createImageData(this.context.canvas.clientWidth, this.context.canvas.clientHeight)
 }
 
-MassPloter.prototype.draw = function (view) {
+GassPloter.prototype.draw = function (view) {
 	const { x: centerX, y: centerY, scale } = view
 	const { context } = this
 	var canvasWidth = context.canvas.clientWidth
@@ -34,15 +36,18 @@ MassPloter.prototype.draw = function (view) {
 	var startx = (centerX + canvasWidthHalf) % stepX
 	var starty = (centerY + canvasHeightHalf) % stepY
 	var inverseScale = stepY / scale
+	this.img = context.getImageData(0, 0,
+		this.context.canvas.clientWidth,
+		this.context.canvas.clientHeight)
 	const points = this.manager.getEnities(Physics).map(
 		(elem) => {
-			var physics = this.manager.get(Physics, elem)[0]
 			var transform = this.manager.get(Transform, elem)[0]
+			var shape = this.manager.get(ShapeCircle, elem)[0]
 			return {
-				mass: physics.mass,
+				radius: shape && shape.radius,
 				positions: transform.positions
 			}
-		})
+		}).filter(({ radius }) => !!radius)
 	for (var x = startx; x <= canvasWidth; x += stepX) {
 		var realX = (x - canvasWidthHalf) / scale + centerX
 		var realY = (starty - canvasHeightHalf) / scale + centerY
@@ -51,18 +56,19 @@ MassPloter.prototype.draw = function (view) {
 			var pointsLength = points.length
 			for (var i = 0; i < pointsLength; i++) {
 				var point = points[i]
-				sum += 3000 * point.mass / squareDistance([realX, realY], point)
+				sum += 30000 * point.radius / squareDistance([realX, realY], point)
 			}
 			var colorMin2 = Math.min(sum / 16.0, COLORS - 1)
 			var colorMin = Math.max(Math.min(sum, COLORS - 1) - colorMin2 * colorMin2 * 0.3, 0)
-			this.imgRect(x - halfStepX, y - halfStepY, stepX, stepY, [colorMin2, 0, colorMin, 255])
+			var colorMax = Math.max(colorMin, colorMin2)
+			this.imgRect(x - halfStepX, y - halfStepY, stepX, stepY, [255 - colorMin, 0, 255 - colorMin2, colorMax])
 			realY += inverseScale
 		}
 	}
 	context.putImageData(this.img, 0, 0)
 }
 
-MassPloter.prototype.imgRect = function (x, y, width, height, color) {
+GassPloter.prototype.imgRect = function (x, y, width, height, color) {
 
 	const realWidth = Math.max(Math.min(width, this.context.canvas.clientWidth - x), 0)
 	const realHeight = Math.max(Math.min(height, this.context.canvas.clientHeight - y), 0)
@@ -74,15 +80,16 @@ MassPloter.prototype.imgRect = function (x, y, width, height, color) {
 	const rowLength = this.context.canvas.clientWidth * 4
 	const startY = realY * rowLength
 	const endY = realHeight * rowLength + startY
+	const over = color[3] / 255
 	for (var i = startY; i < endY; i += rowLength) {
 		for (var j = startX; j < endX; j += 4) {
 			var ij = i + j
-			data[ij] = color[0]
-			data[ij + 1] = color[1]
-			data[ij + 2] = color[2]
-			data[ij + 3] = color[3]
+			data[ij] = interpolate(data[ij], color[0], over)
+			data[ij + 1] = interpolate(data[ij + 1], color[1], over)
+			data[ij + 2] = interpolate(data[ij + 2], color[2], over)
+			data[ij + 3] = Math.max(color[3], data[ij + 3])
 		}
 	}
 }
 
-export default MassPloter
+export default GassPloter
