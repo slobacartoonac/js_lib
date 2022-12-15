@@ -64,6 +64,19 @@ Vector.prototype.add = function (toAdd) {
 	}
 	return ret
 }
+
+Vector.prototype.update = function (newValues) {
+	for (var k = 0; k < this.length; k++) {
+		if (!Object.hasOwnProperty.call(this, k)) {
+			continue;
+		}
+		if (!Object.hasOwnProperty.call(newValues, k)) {
+			continue;
+		}
+		this[k] = newValues[k]
+	}
+}
+
 Vector.prototype.negate = function () {
 	let ret = this.copy()
 	for (var k = 0; k < ret.length; k++) {

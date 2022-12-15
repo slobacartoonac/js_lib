@@ -44,7 +44,7 @@ PhysicsEngine.prototype.compute = function () {
 		var physics = this.manager.get(Physics, elem)[0]
 		physics.compute()
 		var transform = this.manager.get(Transform, elem)[0]
-		transform.positions.add(physics.speeds)
+		transform.positions = transform.positions.add(physics.speeds)
 	})
 }
 
