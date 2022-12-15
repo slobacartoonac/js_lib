@@ -1,6 +1,7 @@
+import { Vector } from '../../shapes/vector'
 import { Transform } from './transform'
 function Physics(speeds, mass, drag) {
-	this.speeds = speeds
+	this.speeds = new Vector(speeds)
 	this.mass = mass
 	this.drag = isNaN(drag) ? 0.001 : drag
 	this.maxSpeed = 100
