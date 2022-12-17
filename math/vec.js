@@ -50,6 +50,13 @@ function interpolate(vecA, vecB, over) {
     let left = 1 - over
     return vecA * left + vecB * over
 }
+function magnitude(aX, aY) {
+    return Math.sqrt(aX * aX, aY * aY)
+}
+
+function distance(aX, aY, bX, bY) {
+    return magnitude(aX - bX, aY - bY)
+}
 
 export {
     pointInTriangle,
@@ -58,5 +65,7 @@ export {
     lineCollision,
     sign,
     interpolateVecs,
-    interpolate
+    interpolate,
+    distance,
+    magnitude
 }

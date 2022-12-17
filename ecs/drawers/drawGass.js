@@ -1,15 +1,7 @@
-import { interpolate } from '../../math/vec.js'
+import { interpolate, distance } from '../../math/vec.js'
 import { ShapeCircle } from '../../shapes/circle.js'
-import { Vector } from '../../shapes/vector.js'
 import { Physics } from '../physics/physics.js'
 import { Transform } from '../physics/transform'
-
-const squareDistance = (point, nodeB) => {
-	var square = 0
-	for (var i = 0; i < point.length; i++)
-		square += Math.pow((point[i] - nodeB.positions[i]), 2)
-	return isNaN(square) || square < 1 ? 1 : square
-}
 
 var COLORS = 16 * 16
 
@@ -20,20 +12,34 @@ function GassPloter(context, manager) {
 }
 
 GassPloter.prototype.update = function () {
-	this.cells = {}
-	this.img = this.context.createImageData(this.context.canvas.clientWidth, this.context.canvas.clientHeight)
+	this.width = this.context.canvas.clientWidth
+	this.height = this.context.canvas.clientHeight
+	this.step = 4
+	this.widthSteps = this.width / this.step
+	this.heightSteps = this.height / this.step
+	this.number = this.widthSteps * this.heightSteps
+	this.cells = {
+		p: new Float32Array(this.number),
+		v: new Float32Array(this.number),
+		h: new Float32Array(this.number),
+		o: new Uint8Array(this.number),
+	}
+	this.cells.p.fill(1)
+	this.cells.v.fill(0)
+	this.cells.h.fill(0)
+	this.cells.o.fill(0)
+	this.img = this.context.createImageData(this.width, this.height)
 }
 
 GassPloter.prototype.draw = function (view) {
 	const { x: centerX, y: centerY, scale } = view
 	const { context } = this
-
 	var canvasWidth = context.canvas.clientWidth
 	var canvasHeight = context.canvas.clientHeight
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
-	const stepX = 4
-	const stepY = 4
+	const stepX = this.step
+	const stepY = this.step
 	const halfStepX = stepX / 2
 	const halfStepY = stepY / 2
 	var startx = (centerX + canvasWidthHalf) % stepX
@@ -53,20 +59,24 @@ GassPloter.prototype.draw = function (view) {
 				positions: transform.positions
 			}
 		}).filter(({ radius }) => !!radius)
-
+	//this.cells.o.fill(0)
 	for (var x = startx; x <= canvasWidth; x += stepX) {
 		var realX = (x - canvasWidthHalf) / scale + centerX
 		var realY = (starty - canvasHeightHalf) / scale + centerY
+		var realXround = Math.max(Math.round(realX - halfStepX), 0)
 		for (var y = starty; y <= canvasHeight; y += stepY) {
-			var realVec = new Vector(realX, realY)
-			let cellId = Math.round(realX) + '-' + Math.round(realY)
+			var realYround = Math.max(Math.round(realY - halfStepY), 0)
+			var cellId = realXround + realYround * this.widthSteps
 			var sum = 0
 			var pointsLength = points.length
 			for (var i = 0; i < pointsLength; i++) {
 				var point = points[i]
-				if (point.radius > point.positions.substract(realVec).magnitude()) {
-
-					this.cells[cellId] ? this.cells[cellId].update(point.speeds) : this.cells[cellId] = point.speeds.copy()
+				if (point.radius >
+					distance(point.positions[0],
+						point.positions[1],
+						realX,
+						realY)) {
+					this.cells.o[cellId] = 1
 				}
 			}
 			if (this.cells[cellId]) {
