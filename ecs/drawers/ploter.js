@@ -2,7 +2,7 @@ import { screenToWorld, worldToScreen } from "../../math/view"
 
 function Ploter(canvas) {
 	this.canvas = canvas
-	this.context = this.canvas.getContext('2d')
+	this.context = this.canvas.getContext('2d', { willReadFrequently: true })
 	this.img = this.context.createImageData(this.canvas.width, this.canvas.height)
 }
 
