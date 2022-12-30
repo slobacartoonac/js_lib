@@ -2,6 +2,9 @@ import { ShapeCircle } from '../../shapes/circle.js'
 import { Physics } from './physics.js'
 import { Transform } from './transform.js'
 
+
+function PlasticBody() { }
+
 function PlasticColisionEngine(manager) {
 	this.manager = manager
 	this.physic_entity = null
@@ -38,7 +41,9 @@ function computeColision(
 
 PlasticColisionEngine.prototype.compute = function () {
 
-	var physic_entity = this.manager.getEnities(Physics).map((elem) => {
+	var physic_entity = this.manager.getEnities(Physics).filter(elem =>
+		this.manager.get(PlasticBody, elem)[0]
+	).map((elem) => {
 		var circle = this.manager.get(ShapeCircle, elem)[0]
 		var transform = this.manager.get(Transform, elem)[0]
 		var physics = this.manager.get(Physics, elem)[0]
@@ -86,5 +91,6 @@ PlasticColisionEngine.prototype.merge = function (nodeA, nodeB) {
 }
 
 export {
-	PlasticColisionEngine
+	PlasticColisionEngine,
+	PlasticBody
 }

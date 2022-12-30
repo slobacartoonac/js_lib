@@ -10,6 +10,9 @@ GravityColorEngine.prototype.compute = function () {
 	this.manager.getEnities(Renderer).map(
 		(elem) => {
 			var renderers = this.manager.get(Renderer, elem)[0]
+			if (!renderers.color) {
+				return
+			}
 			var mass = this.manager.get(Physics, elem)[0].mass
 			var volume = Math.pow(this.manager.get(ShapeCircle, elem)[0].radius, 3) * Math.PI
 			var dencity = mass / volume * 10 * Math.PI

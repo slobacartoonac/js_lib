@@ -10,12 +10,14 @@ function Physics(speeds, mass, drag) {
 
 Physics.prototype.applyForce = function (force) {
 	for (var i = 0; i < this.speeds.length; i++) {
+		if (isNaN(force[i])) throw new Error("Physics.prototype.applyForce got NnN")
 		this.speeds[i] += force[i] / this.mass
 	}
 }
 
 Physics.prototype.applyAsc = function (asc) {
 	for (var i = 0; i < this.speeds.length; i++) {
+		if (isNaN(asc[i])) throw new Error("Physics.prototype.applyAsc got NnN")
 		this.speeds[i] += asc[i]
 	}
 }
