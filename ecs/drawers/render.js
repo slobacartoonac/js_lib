@@ -5,6 +5,7 @@ import { ShapeText } from '../../shapes/text.js'
 import { Sprite } from '../../shapes/sprite.js'
 import { ShapeRounded } from '../../shapes/rounded-box.js'
 import { TransformRotate } from '../physics/transformRotate.js'
+import { ShapeNoScale } from '../../shapes/noScale.js'
 
 function Renderer(color, stroke, layer) {
 	this.color = color
@@ -77,10 +78,13 @@ RenderEngine.prototype.draw = function (view) {
 			if (x < -maxSize || y < -maxSize || x > canvasWidth || y > canvasHeight)
 				return
 
+			let fixed = this.manager.get(ShapeNoScale, elem)[0]
+			let scaleWith = fixed ? 1 : scale
+
 			let circles = this.manager.get(ShapeCircle, elem)
 			for (let i in circles) {
 				let circle = circles[i];
-				const elementSize = circle.radius * scale > 1 ? circle.radius * scale : 1
+				const elementSize = circle.radius * scaleWith > 1 ? circle.radius * scaleWith : 1
 				context.beginPath()
 				context.arc(x, y, elementSize, 0, 2 * Math.PI, false)
 				shapeDone(context, renderer);
@@ -90,8 +94,8 @@ RenderEngine.prototype.draw = function (view) {
 			let rotate = this.manager.get(TransformRotate, elem)[0]
 			for (let i in boxes) {
 				let box = boxes[i];
-				const size_x = box.x * scale > 1 ? box.x * scale : 1
-				const size_y = box.y * scale > 1 ? box.y * scale : 1
+				const size_x = box.x * scaleWith > 1 ? box.x * scaleWith : 1
+				const size_y = box.y * scaleWith > 1 ? box.y * scaleWith : 1
 				context.save();
 				if (rotate) {
 					context.translate(x + size_x / 2, y + size_y / 2);
@@ -115,8 +119,8 @@ RenderEngine.prototype.draw = function (view) {
 				if (!box) {
 					break;
 				}
-				const size_x = box.x * scale > 1 ? box.x * scale + 0.5 : 1
-				const size_y = box.y * scale > 1 ? box.y * scale + 0.5 : 1
+				const size_x = box.x * scaleWith > 1 ? box.x * scaleWith + 0.5 : 1
+				const size_y = box.y * scaleWith > 1 ? box.y * scaleWith + 0.5 : 1
 				context.save();
 				if (rotate) {
 					context.translate(x + size_x / 2, y + size_y / 2);
@@ -129,7 +133,7 @@ RenderEngine.prototype.draw = function (view) {
 			let texts = this.manager.get(ShapeText, elem)
 			for (let i in texts) {
 				let text = texts[i]
-				const size_y = text.font * scale > 1 ? text.font * scale : 1
+				const size_y = text.font * scaleWith > 1 ? text.font * scaleWith : 1
 				context.fillStyle = renderer.color;
 				context.font = parseInt(size_y) + 'px serif';
 				context.save();
