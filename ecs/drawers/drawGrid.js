@@ -1,9 +1,10 @@
-import { screenToWorld } from "../../math/view"
+import { screenToWorld, worldToScreen } from "../../math/view"
 import { interpolate } from "../../math/vec"
 
 function GridPloter(ctx, options) {
 	this.context = ctx
 	this.showCords = options?.showCords
+	this.showAxis = options?.showAxis
 	this.axisCords = options?.axisCords
 	this.axisScale = options?.axisScale || 100
 	this.devide = options?.devide || 2
@@ -25,6 +26,25 @@ GridPloter.prototype.draw = function (sizex, sizey, view) {
 	const stepY = sizey * gridScale
 	var startx = (-centerX * scale + canvasWidthHalf) % stepX
 	var starty = (-centerY * scale + canvasHeightHalf) % stepY
+
+	if (this.showAxis) {
+		context.beginPath()
+		let [scrCenterX, scrCenterY] = worldToScreen(
+			centerX,
+			centerY,
+			scale,
+			canvasWidth,
+			canvasHeight,
+			0, 0)
+		context.lineWidth = 2
+		context.moveTo(scrCenterX, 0)
+		context.lineTo(scrCenterX, canvasHeight)
+		context.moveTo(0, scrCenterY)
+		context.lineTo(canvasWidth, scrCenterY)
+		context.strokeStyle = 'rgba(0, 0, 0, 1.0)'
+		context.stroke()
+	}
+
 	context.beginPath()
 	for (var x = startx; x <= canvasWidth; x += stepX) {
 		context.moveTo(x, 0)
@@ -75,7 +95,7 @@ GridPloter.prototype.draw = function (sizex, sizey, view) {
 			context.lineTo(canvasWidth, y)
 		}
 		context.lineWidth = 1
-		context.strokeStyle = 'rgba(128, 128, 128, ' + interpolate(0.25, 0.75, gridScale - 1) + ')'
+		context.strokeStyle = 'rgba(128, 128, 128, ' + interpolate(0.25, 0.5, gridScale - 1) + ')'
 		context.stroke()
 	}
 	if (this.showCords) {
