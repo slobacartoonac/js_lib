@@ -17,25 +17,11 @@ FunctionPloter.prototype.draw = function (view, a, h, k, color) {
 	context.beginPath()
 	context.moveTo(x, 0)
 	for (var x = startx; x <= canvasWidth; x += stepX) {
-		let cordX = screenToWorld(
-			centerX,
-			centerY,
-			scale,
-			canvasWidth,
-			canvasHeight,
-			x,
-			0
-		)[0]
-		let cordY = a * ((cordX / 100 - h) * (cordX / 100 - h)) + k
-		let scrY = worldToScreen(
-			centerX,
-			centerY,
-			scale,
-			canvasWidth,
-			canvasHeight,
-			0,
-			- cordY * 100
-		)[1]
+		//(pointX - widthHalf) / viewScale + viewCenterX
+		let cordX = ((x - canvasWidthHalf) / scale + centerX) / 100
+		let cordY = -(a * (cordX - h) * (cordX - h) + k) * 100
+		//var screenY = (pointY - viewCenterY) * viewScale + heightHalf
+		var scrY = (cordY - centerY) * scale + canvasHeightHalf
 		context.lineTo(x, scrY)
 	}
 	context.lineWidth = 2
