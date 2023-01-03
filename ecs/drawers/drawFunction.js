@@ -11,12 +11,7 @@ FunctionPloter.prototype.draw = function (view, a, h, k, color) {
 	const { x: centerX, y: centerY, scale } = view
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
-	var gridScale = scale
-	while (gridScale > 2)
-		gridScale /= 2
-	while (gridScale < 1)
-		gridScale *= 2
-	const stepX = 5 * gridScale
+	const stepX = 5
 	//const stepY = sizey * gridScale
 	var startx = (-centerX * scale + canvasWidthHalf) % stepX
 	context.beginPath()
