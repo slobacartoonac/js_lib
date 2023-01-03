@@ -1,12 +1,10 @@
 import { Vector } from "../shapes/vector";
 
 // written by Slobodan Zivkovic slobacartoonac@gmail.com
-function ScreenPosition(screen, touch, options) {
+function ScreenPosition(screen, options) {
     Vector.call(this)
     this.push(0, 0, 1, 0)
-
     this.screen = screen;
-    this.touch = touch;
     Object.assign(this, options || {})
     Object.defineProperty(this, 'scale', {
         get() {
@@ -29,7 +27,7 @@ function ScreenPosition(screen, touch, options) {
 ScreenPosition.prototype = Object.create(Vector.prototype)
 
 
-ScreenPosition.prototype.zoom = function (scaleFactor) {
+ScreenPosition.prototype.zoom = function (scaleFactor, x, y) {
     this.scale *= scaleFactor
     if (!isNaN(this.minScale) && this.scale < this.minScale) {
         this.scale = this.minScale
@@ -39,10 +37,12 @@ ScreenPosition.prototype.zoom = function (scaleFactor) {
         this.scale = this.maxScale
         return
     }
-    let scaleDiff = scaleFactor - 1
-    let xOffset = (this.screen.width / 2 - this.touch.mousePosition.x) * scaleDiff
-    let yOffset = (this.screen.height / 2 - this.touch.mousePosition.y) * scaleDiff
-    this.move(xOffset, yOffset)
+    if (x !== undefined && y !== undefined) {
+        let scaleDiff = scaleFactor - 1
+        let xOffset = (this.screen.width / 2 - x) * scaleDiff
+        let yOffset = (this.screen.height / 2 - y) * scaleDiff
+        this.move(xOffset, yOffset)
+    }
 }
 
 ScreenPosition.prototype.rotate = function (angle) {

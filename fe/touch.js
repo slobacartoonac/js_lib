@@ -55,7 +55,7 @@ function Touch(div, deadzone) {
 	let click = true;
 	let touch = false;
 	let touchSecound = false;
-	this.mousePosition = { x: 0, y: 0 };
+	this.centerPosition = { x: 0, y: 0 };
 	this.debug = false;
 	this.console_error = false;
 	this.throw_error = false;
@@ -66,19 +66,19 @@ function Touch(div, deadzone) {
 		if (e.touches[1] && e.touches[0]) {
 			let first = { x: e.touches[0].clientX - left, y: e.touches[0].clientY - top }
 			let secound = { x: e.touches[1].clientX - left, y: e.touches[1].clientY - top }
-			this.mousePosition = { x: (first.x + secound.x) / 2, y: (first.y + secound.y) / 2 }
+			this.centerPosition = { x: (first.x + secound.x) / 2, y: (first.y + secound.y) / 2 }
 			return moveTouch(first, secound)
 		}
 		if (e.touches[0]) {
 			let first = { x: e.touches[0].clientX - left, y: e.touches[0].clientY - top }
-			this.mousePosition = { x: first.x, y: first.y }
+			this.centerPosition = { x: first.x, y: first.y }
 			return moveTouch(first)
 		}
 	}
 	const moveTouchM = (e) => {
 		e.preventDefault()
 		const { top, left } = e.target.getBoundingClientRect()
-		this.mousePosition = { x: e.clientX - left, y: e.clientY - top }
+		this.centerPosition = { x: e.clientX - left, y: e.clientY - top }
 		if (mouseDown) moveTouch({ x: e.clientX - left, y: e.clientY - top })
 	}
 
@@ -145,7 +145,8 @@ function Touch(div, deadzone) {
 			angle,
 			deltaAngle,
 			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
-			debug
+			debug,
+			centerPosition: this.centerPosition
 		}
 
 		this.triger('force', addition)
@@ -205,7 +206,8 @@ function Touch(div, deadzone) {
 			angle,
 			deltaAngle,
 			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
-			debug
+			debug,
+			centerPosition: this.centerPosition
 		}
 		touch = false
 		touchSecound = false;
