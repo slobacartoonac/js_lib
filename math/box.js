@@ -32,11 +32,11 @@ function pointInBoxAny(positionsA, boxA, point) {
 }
 
 function pointInBox(positions, boxA, point) {
-    if (positions[0] > point[0] || positions[1] > point[1]) {
+    if (positions[0] > point[0] ||
+        positions[1] > point[1]) {
         return false
     }
-    if ((positions[0] + boxA[0]) < point[0]
-        ||
+    if ((positions[0] + boxA[0]) < point[0] ||
         (positions[1] + boxA[1]) < point[1]) {
         return false
     }
