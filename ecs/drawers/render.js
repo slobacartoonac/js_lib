@@ -116,11 +116,10 @@ RenderEngine.prototype.draw = function (view) {
 			for (let i in sprites) {
 				let sprite = sprites[i];
 				let box = boxes[0];
-				if (!box) {
-					break;
-				}
-				const size_x = box.x * scaleWith > 1 ? box.x * scaleWith + 0.5 : 1
-				const size_y = box.y * scaleWith > 1 ? box.y * scaleWith + 0.5 : 1
+				let spriteWith = box?.x || sprite.image.width
+				let spriteHeight = box?.x || sprite.image.height
+				const size_x = spriteWith * scaleWith > 1 ? spriteWith * scaleWith + 0.5 : 1
+				const size_y = spriteHeight * scaleWith > 1 ? spriteHeight * scaleWith + 0.5 : 1
 				context.save();
 				if (rotate) {
 					context.translate(x + size_x / 2, y + size_y / 2);
