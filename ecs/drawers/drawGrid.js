@@ -17,7 +17,7 @@ GridPloter.prototype.draw = function (sizex, sizey, view) {
 	const { x: centerX, y: centerY, scale } = view
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
-	var gridScale = scale
+	var gridScale = scale || 1
 	while (gridScale > 2)
 		gridScale /= 2
 	while (gridScale < 1)
