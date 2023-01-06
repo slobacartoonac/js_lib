@@ -15,7 +15,6 @@ function setAsociation(manager, ...boxes) {
 
 export function createTextBaloon(manager, renderer, positions, text, options) {
     let entities = []
-    let stabiley = positions[1]
     let textWidth = 0
     let textChunks = chunkString(text)
     let textSize = options?.textSize || 20
@@ -23,17 +22,24 @@ export function createTextBaloon(manager, renderer, positions, text, options) {
     let background = options?.background || '#ffffffaa'
     let borderColor = options?.borderColor || '#ffffff'
     let borderWidth = options?.borderWidth || 1
+    let anchor = options?.anchor || [0, 0]
+    let paddingX = options?.paddingX || options?.padding || 10
+    let paddingY = options?.paddingY || options?.padding || 10
     let shapes = textChunks.map((str) => {
         let shapeText = new ShapeText(textSize, str)
         textWidth = Math.max(renderer.mesure(shapeText).width, textWidth)
         return shapeText
     })
+    let boxWidth = textWidth + paddingX * 2
+    let boxHeight = shapes.length * lineHeight + paddingY * 2
+    let posX = positions[0] - boxWidth * anchor[0]
+    let posY = positions[1] - boxHeight * anchor[1]
     let boxes = createBodrededBoxColor(
         manager,
-        positions[0] - textWidth / 2 - 5,
-        stabiley,
-        textWidth + 10,
-        shapes.length * lineHeight + 10,
+        posX,
+        posY,
+        boxWidth,
+        boxHeight,
         background,
         { color: borderColor, width: borderWidth }
     )
@@ -41,7 +47,7 @@ export function createTextBaloon(manager, renderer, positions, text, options) {
     setAsociation(manager, ...boxes)
     shapes.map((shapeText, line) => {
         let entityText = manager.create()
-        manager.asign(new Transform([positions[0] - textWidth / 2, stabiley + line * lineHeight + 5]), entityText)
+        manager.asign(new Transform([posX + paddingX, posY + paddingY + line * lineHeight]), entityText)
         manager.asign(shapeText, entityText)
         manager.asign(new Renderer('#000000', null, 2), entityText)
         entities.push(entityText)
