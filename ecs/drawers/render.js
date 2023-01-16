@@ -6,6 +6,7 @@ import { Sprite } from '../../shapes/sprite.js'
 import { ShapeRounded } from '../../shapes/rounded-box.js'
 import { TransformRotate } from '../physics/transformRotate.js'
 import { ShapeNoScale } from '../../shapes/noScale.js'
+import { ShapeScale } from '../../shapes/scale.js'
 
 function Renderer(color, stroke, layer) {
 	this.color = color
@@ -79,7 +80,8 @@ RenderEngine.prototype.draw = function (view) {
 				return
 
 			let fixed = this.manager.get(ShapeNoScale, elem)[0]
-			let scaleWith = fixed ? 1 : scale
+			let selfScale = this.manager.get(ShapeScale, elem)[0]
+			let scaleWith = fixed ? 1 : scale * (selfScale?.scale || 1)
 
 			let circles = this.manager.get(ShapeCircle, elem)
 			for (let i in circles) {

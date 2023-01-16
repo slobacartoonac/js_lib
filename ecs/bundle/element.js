@@ -3,6 +3,7 @@ import { ShapeBox } from "../../shapes/box"
 import { ShapeRounded } from "../../shapes/rounded-box"
 import { Sprite } from "../../shapes/sprite"
 import { ShapeText } from "../../shapes/text"
+import { ShapeScale } from "../../shapes/scale"
 import { Renderer } from "../drawers/render"
 import { Selectable } from "../drawers/select_ecs"
 import { Transform } from "../physics/transform"
@@ -40,6 +41,9 @@ export const createSprite = (manager, x, y, element, sx, sy) => {
     manager.asign(new Transform([x, y]), entity)
     if (sx && sy) {
         manager.asign(new ShapeBox(sx, sy), entity)
+    }
+    if (sx && !sy) {
+        manager.asign(new ShapeScale(sx), entity)
     }
     let img = ImageHash.get(element || planeBase64)
     manager.asign(new Sprite(img), entity)
