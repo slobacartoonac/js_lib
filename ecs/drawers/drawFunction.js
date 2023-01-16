@@ -1,11 +1,10 @@
-import { findQuad } from "../../math/func"
 import { screenToWorld, worldToScreen } from "../../math/view"
 
 function FunctionPloter(ctx) {
 	this.context = ctx
 }
 
-FunctionPloter.prototype.draw = function (view, a, h, k, color) {
+FunctionPloter.prototype.draw = function (view, func, color) {
 	const { context } = this
 	var canvasWidth = context.canvas.clientWidth
 	var canvasHeight = context.canvas.clientHeight
@@ -20,7 +19,7 @@ FunctionPloter.prototype.draw = function (view, a, h, k, color) {
 	for (var x = startx; x <= canvasWidth; x += stepX) {
 		//(pointX - widthHalf) / viewScale + viewCenterX
 		let cordX = ((x - canvasWidthHalf) / scale + centerX) / 100
-		let cordY = -findQuad(cordX, a, h, k) * 100
+		let cordY = -func(cordX) * 100
 		//var screenY = (pointY - viewCenterY) * viewScale + heightHalf
 		var scrY = (cordY - centerY) * scale + canvasHeightHalf
 		context.lineTo(x, scrY)
