@@ -24,9 +24,14 @@ GridPloter.prototype.draw = function (sizex, sizey, view) {
 		gridScale *= 2
 	const stepX = sizex * gridScale
 	const stepY = sizey * gridScale
-	var startx = (-centerX * scale + canvasWidthHalf) % stepX
-	var starty = (-centerY * scale + canvasHeightHalf) % stepY
-
+	var startx = (canvasWidthHalf - centerX * scale) % stepX
+	var starty = (canvasHeightHalf - centerY * scale) % stepY
+	if (startx < 0) {
+		startx += stepX
+	}
+	if (starty < 0) {
+		starty += stepY
+	}
 	if (this.showAxis) {
 		context.beginPath()
 		let [scrCenterX, scrCenterY] = worldToScreen(
@@ -116,14 +121,27 @@ GridPloter.prototype.drawCod = function (eX, eY, view, context) {
 	const canvasHeightHalf = canvasHeight / 2
 	var x = (eX - centerX) * scale + canvasWidthHalf
 	var y = (eY - centerY) * scale + canvasHeightHalf
-	if (x < 0 || y < 0 || x > canvasWidth || y > canvasHeight)
-		return
-	// const elementSize = 5 * scale > 1 ? 5 * scale : 1
-	// context.beginPath()
-	// context.arc(x, y, elementSize, 0, 2 * Math.PI, false)
-	// context.lineWidth = 1
-	// context.strokeStyle = element[3]
-	// context.stroke()
+	let outOfScreen = false
+	if (x < 5 ||
+		x > canvasWidth - 19 ||
+		y > canvasHeight - 28 ||
+		y < 14) {
+		outOfScreen = true
+	}
+
+
+	if (x < 5) {
+		x = 5
+	}
+	if (y < 14) {
+		y = 14
+	}
+	if (x > canvasWidth - 19) {
+		x = canvasWidth - 19
+	}
+	if (y > canvasHeight - 28) {
+		y = canvasHeight - 28
+	}
 	context.font = '14px Verdana'
 	context.fillStyle = 'rgb(0, 0, 0, 1.0)'
 	function trimNum(value) {
@@ -139,9 +157,10 @@ GridPloter.prototype.drawCod = function (eX, eY, view, context) {
 	if (eyt) {
 		text += eyt
 	}
-	if (!eyt && !ext) {
+	if (!eyt && !ext && !outOfScreen) {
 		text += "0"
 	}
+
 	context.fillText(text, x + 5, y + 14)
 }
 
