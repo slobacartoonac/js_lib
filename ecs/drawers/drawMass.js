@@ -1,5 +1,6 @@
 import { Physics } from '../physics/physics.js'
 import { Transform } from '../physics/transform'
+import { ImageDataPloter } from './imageData.js'
 
 const squareDistance = (point, nodeB) => {
 	var square = 0
@@ -12,12 +13,12 @@ var COLORS = 16 * 16
 
 function MassPloter(context, manager) {
 	this.context = context
-	this.update();
+	this.imgData = new ImageDataPloter(context, manager)
 	this.manager = manager
 }
 
 MassPloter.prototype.update = function () {
-	this.img = this.context.createImageData(this.context.canvas.clientWidth, this.context.canvas.clientHeight)
+	this.imgData.update()
 }
 
 MassPloter.prototype.draw = function (view) {
@@ -27,8 +28,8 @@ MassPloter.prototype.draw = function (view) {
 	var canvasHeight = context.canvas.clientHeight
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
-	const stepX = 4
-	const stepY = 4
+	const stepX = 2
+	const stepY = 2
 	const halfStepX = stepX / 2
 	const halfStepY = stepY / 2
 	var startx = (centerX + canvasWidthHalf) % stepX
@@ -43,6 +44,7 @@ MassPloter.prototype.draw = function (view) {
 				positions: transform.positions
 			}
 		})
+	this.imgData.pull()
 	for (var x = startx; x <= canvasWidth; x += stepX) {
 		var realX = (x - canvasWidthHalf) / scale + centerX
 		var realY = (starty - canvasHeightHalf) / scale + centerY
@@ -55,11 +57,11 @@ MassPloter.prototype.draw = function (view) {
 			}
 			var colorMin2 = Math.min(sum / 16.0, COLORS - 1)
 			var colorMin = Math.max(Math.min(sum, COLORS - 1) - colorMin2 * colorMin2 * 0.3, 0)
-			this.imgRect(x - halfStepX, y - halfStepY, stepX, stepY, [colorMin2, 0, colorMin, 255])
+			this.imgData.imgRect(x - halfStepX, y - halfStepY, stepX, stepY, [colorMin2, 0, colorMin])
 			realY += inverseScale
 		}
 	}
-	context.putImageData(this.img, 0, 0)
+	context.putImageData(this.imgData.img, 0, 0)
 }
 
 MassPloter.prototype.imgRect = function (x, y, width, height, color) {

@@ -1,23 +1,24 @@
 import { interpolate } from '../../math/vec.js'
 import { Physics } from '../physics/physics.js'
 import { Transform } from '../physics/transform'
+import { ImageDataPloter } from './imageData'
 
-const distance = (point, nodeB) => {
+const distance = (point, pointB) => {
 	var square = 0
 	for (var i = 0; i < point.length; i++)
-		square += Math.pow((point[i] - nodeB.positions[i]), 2)
+		square += (point[i] - pointB[i]) * (point[i] - pointB[i])
 	return isNaN(square) || square < 1 ? 1 : Math.sqrt(square)
 }
 
 function GalaxyPloter(context, manager, colors) {
 	this.colors = colors
 	this.context = context
-	this.update();
+	this.imgData = new ImageDataPloter(context, manager)
 	this.manager = manager
 }
 
 GalaxyPloter.prototype.update = function () {
-	this.img = this.context.createImageData(this.context.canvas.clientWidth, this.context.canvas.clientHeight)
+	this.imgData.update()
 }
 
 GalaxyPloter.prototype.draw = function (view) {
@@ -27,8 +28,8 @@ GalaxyPloter.prototype.draw = function (view) {
 	var canvasHeight = context.canvas.clientHeight
 	const canvasWidthHalf = canvasWidth / 2
 	const canvasHeightHalf = canvasHeight / 2
-	const stepX = 4
-	const stepY = 4
+	const stepX = 2
+	const stepY = 2
 	const halfStepX = stepX / 2
 	const halfStepY = stepY / 2
 	var startx = (centerX + canvasWidthHalf) % stepX
@@ -43,6 +44,8 @@ GalaxyPloter.prototype.draw = function (view) {
 				positions: transform.positions
 			}
 		})
+	this.imgData.pull()
+	var colorCount = new Array(this.colors.length).fill(0)
 	for (var x = startx; x <= canvasWidth; x += stepX) {
 		var realX = (x - canvasWidthHalf) / scale + centerX
 		var realY = (starty - canvasHeightHalf) / scale + centerY
@@ -51,46 +54,23 @@ GalaxyPloter.prototype.draw = function (view) {
 			var pointsLength = points.length
 			for (var i = 0; i < pointsLength; i++) {
 				var point = points[i]
-				sum += point.mass / distance([realX, realY], point)
+				sum += point.mass / distance([realX, realY], point.positions)
 			}
-			var colorPosition = Math.min(sum / 64.0, this.colors.length - 1)
-			var index = this.colors.length - 1 - Math.floor(colorPosition)
-			var color = this.colors[index]
-			if (index < this.colors.length - 1) {
-				let color2 = this.colors[index + 1]
-				var over = colorPosition % 1
-				color = color.map((c, index) => interpolate(color2[index], c, over))
-			}
+			var colorPosition = Math.max(this.colors.length - sum / 64.0, 0);
+			var over = colorPosition % 1
+			var index1 = Math.min(this.colors.length - 1, Math.floor(colorPosition))
+			var index2 = Math.min(this.colors.length - 1, Math.ceil(colorPosition))
+			var color = this.colors[index2]
+			let color2 = this.colors[index1]
+			colorCount[index1]++
+			color = color.map((c, index) => interpolate(color2[index], c, over))
 
-
-			this.imgRect(x - halfStepX, y - halfStepY, stepX, stepY, [color[0], color[1], color[2], 255])
+			this.imgData.imgRect(x - halfStepX, y - halfStepY, stepX, stepY, [color[0], color[1], color[2]])
 			realY += inverseScale
 		}
 	}
-	context.putImageData(this.img, 0, 0)
-}
-
-GalaxyPloter.prototype.imgRect = function (x, y, width, height, color) {
-
-	const realWidth = Math.max(Math.min(width, this.context.canvas.clientWidth - x), 0)
-	const realHeight = Math.max(Math.min(height, this.context.canvas.clientHeight - y), 0)
-	const realX = Math.max(Math.round(x), 0)
-	const realY = Math.max(Math.round(y), 0)
-	const data = this.img.data
-	const startX = realX * 4
-	const endX = realWidth * 4 + startX
-	const rowLength = this.context.canvas.clientWidth * 4
-	const startY = realY * rowLength
-	const endY = realHeight * rowLength + startY
-	for (var i = startY; i < endY; i += rowLength) {
-		for (var j = startX; j < endX; j += 4) {
-			var ij = i + j
-			data[ij] = color[0]
-			data[ij + 1] = color[1]
-			data[ij + 2] = color[2]
-			data[ij + 3] = color[3]
-		}
-	}
+	console.log(colorCount)
+	context.putImageData(this.imgData.img, 0, 0)
 }
 
 export default GalaxyPloter
