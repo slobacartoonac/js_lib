@@ -2,6 +2,7 @@ import { screenToWorld, worldToScreen } from "../../math/view"
 
 function FunctionPloter(ctx) {
 	this.context = ctx
+	this.scale = 100
 }
 
 FunctionPloter.prototype.draw = function (view, func, color) {
@@ -18,8 +19,8 @@ FunctionPloter.prototype.draw = function (view, func, color) {
 	context.moveTo(x, 0)
 	for (var x = startx; x <= canvasWidth; x += stepX) {
 		//(pointX - widthHalf) / viewScale + viewCenterX
-		let cordX = ((x - canvasWidthHalf) / scale + centerX) / 100
-		let cordY = -func(cordX) * 100
+		let cordX = ((x - canvasWidthHalf) / scale + centerX) / this.scale
+		let cordY = -func(cordX) * this.scale
 		//var screenY = (pointY - viewCenterY) * viewScale + heightHalf
 		var scrY = (cordY - centerY) * scale + canvasHeightHalf
 		context.lineTo(x, scrY)

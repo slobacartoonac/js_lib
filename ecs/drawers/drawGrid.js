@@ -106,9 +106,9 @@ GridPloter.prototype.draw = function (sizex, sizey, view) {
 	if (this.showCords) {
 		context.font = '10px Arial'
 		context.fillText(
-			(Math.round(view.x * 100) / 100 + Number.EPSILON) +
-			',' + (Math.round(view.y * 100 + Number.EPSILON) / 100) +
-			',' + (Math.round(view.scale * 100 + Number.EPSILON) / 100), 10, 50)
+			(Math.round(view.x * this.axisScale) / this.axisScale + Number.EPSILON) +
+			',' + (Math.round(view.y * this.axisScale + Number.EPSILON) / this.axisScale) +
+			',' + (Math.round(view.scale * this.axisScale + Number.EPSILON) / this.axisScale), 10, 50)
 	}
 }
 
