@@ -69,7 +69,7 @@ GalaxyPloter.prototype.draw = function (view) {
 			realY += inverseScale
 		}
 	}
-	console.log(colorCount)
+	//console.log(colorCount)
 	context.putImageData(this.imgData.img, 0, 0)
 }
 
