@@ -51,7 +51,7 @@ function interpolate(vecA, vecB, over) {
     return vecA * left + vecB * over
 }
 function magnitude(aX, aY) {
-    return Math.sqrt(aX * aX, aY * aY)
+    return Math.sqrt(aX * aX + aY * aY)
 }
 
 function distance(aX, aY, bX, bY) {
