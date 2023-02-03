@@ -22,6 +22,7 @@ function TouchKeyboard(div) {
 
     input.addEventListener('keydown', (event) => {
         if (event.key === "Backspace" && input.value.length <= 1) {
+            input.value = ""
             this.triger("type", "")
             input.blur()
         }
@@ -58,6 +59,10 @@ TouchKeyboard.prototype.focus = function () {
 }
 TouchKeyboard.prototype.blur = function () {
     this.input.blur()
+}
+TouchKeyboard.prototype.setValue = function (value) {
+    this.input.value = value
+    this.triger("type", this.input.value)
 }
 
 TouchKeyboard.prototype.unsub = function (ev, func) {
