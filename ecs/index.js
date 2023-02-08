@@ -16,11 +16,11 @@ Entity.prototype.generation = function () {
 }
 
 function EntityManager() {
-	this._generation = {}
+	this._generation = new Map()
 	this._free_indices = []
-	this._entities = {}
-	this._components = {}
-	this.__entities_with_type = {}
+	this._entities = new Map()
+	this._components = new Map()
+	this.__entities_with_type = new Map()
 }
 
 EntityManager.prototype.create = function () {
@@ -28,11 +28,11 @@ EntityManager.prototype.create = function () {
 	if (this._free_indices.length > MINIMUM_FREE_INDICES) {
 		idx = this._free_indices.shift()
 	} else {
-		idx = Object.keys(this._generation).length
-		this._generation[idx] = 0
+		idx = this._generation.size
+		this._generation.set(idx, 0)
 	}
-	var entity = this.make_entity(idx, this._generation[idx])
-	this._entities[idx] = entity
+	var entity = this.make_entity(idx, this._generation.get(idx))
+	this._entities.set(idx, entity)
 	return entity
 }
 
@@ -41,42 +41,43 @@ EntityManager.prototype.make_entity = function (idx, generation) {
 }
 
 EntityManager.prototype.alive = function (e) {
-	return this._generation[e.index()] == e.generation()
+	return this._generation.get(e.index()) == e.generation()
 }
 
 EntityManager.prototype.destroy = function (e) {
-	this._components[e.id] = undefined
-	this._entities[e.id] = undefined
-	++this._generation[e.index()]
-	this._free_indices.push(e.index())
+	this._components.delete(e.id)
+	this._entities.delete(e.id)
+	let index = e.index()
+	let generation = this._generation.get(index) + 1
+	this._generation.set(index, generation)
+	this._free_indices.push(index)
 }
 
 EntityManager.prototype.asign = function (component, e) {
-	var entity_components = this._components[e.id]
+	var entity_components = this._components.get(e.id)
 	if (!entity_components) {
-		this._components[e.id] = {
-			[component.constructor.name]: [component]
-		}
+		this._components.set(e.id, new Map([[component.constructor.name, [component]]]))
 		return
 	}
-	var components_of_type = entity_components[component.constructor.name]
+	var components_of_type = entity_components.get(component.constructor.name);
 	if (!components_of_type) {
-		this._components[e.id][component.constructor.name] = [component]
+		let elComponents = this._components.get(e.id)
+		elComponents.set(component.constructor.name, [component])
 		return
 	}
 	if (components_of_type &&
-		entity_components[component.constructor.name].find(comp => component === comp)
+		entity_components.get(component.constructor.name).find(comp => component === comp)
 	)
 		throw Error('Component is allready asiged')
-	entity_components[component.constructor.name].push(component)
+	entity_components.get(component.constructor.name).push(component)
 }
 
 EntityManager.prototype.get = function (c_type, e) {
-	var entity_components = this._components[e.id]
+	var entity_components = this._components.get(e.id)
 	if (!entity_components) {
 		return []
 	}
-	var components_of_type = entity_components[c_type.name]
+	var components_of_type = entity_components.get(c_type.name)
 	if (!components_of_type) {
 		return []
 	}
@@ -84,21 +85,21 @@ EntityManager.prototype.get = function (c_type, e) {
 }
 
 EntityManager.prototype.remove = function (component, e) {
-	var entity_components = this._components[e.id]
+	var entity_components = this._components.get(e.id)
 	if (!entity_components) {
 		return
 	}
-	var components_of_type = entity_components[component.constructor.name]
+	var components_of_type = entity_components.get(component.constructor.name)
 	if (!components_of_type) {
 		return
 	}
-	entity_components[component.constructor.name] = entity_components[component.constructor.name].filter(function (compon) {
+	entity_components.set(component.constructor.name, entity_components.get(component.constructor.name).filter(function (compon) {
 		return compon !== component
-	})
+	}))
 }
 
 EntityManager.prototype.getEnities = function (c_type) {
-	return Object.values(this._entities).filter(
+	return [...this._entities.values()].filter(
 		(entity) => {
 			return entity && this.get(c_type, entity).length
 		}
