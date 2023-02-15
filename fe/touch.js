@@ -217,7 +217,8 @@ function Touch(div, deadzone) {
 			if (e.button) {
 				if (e.button === 1) this.triger('bmiddle', addition)
 				if (e.button === 2) this.triger('bright', addition)
-			} else if (saveMove) {
+			}
+			if (saveMove) {
 				this.triger('click', addition)
 			}
 		}
