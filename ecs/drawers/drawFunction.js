@@ -21,8 +21,14 @@ FunctionPloter.prototype.draw = function (view, func, color) {
 		let cordY = -func(cordX) * this.scale
 		//var screenY = (pointY - viewCenterY) * viewScale + heightHalf
 		var scrY = (cordY - centerY) * scale + canvasHeightHalf
-		if (isNaN(scrY) || scrY > canvasHeight || scrY < 0) {
+		if (isNaN(scrY)) {
 			continue
+		}
+		if (scrY > canvasHeight + 5) {
+			scrY = canvasHeight + 5
+		}
+		if (scrY < -5) {
+			scrY = -5
 		}
 		context.lineTo(x, scrY)
 	}
