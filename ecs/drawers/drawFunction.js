@@ -1,5 +1,3 @@
-import { screenToWorld, worldToScreen } from "../../math/view"
-
 function FunctionPloter(ctx) {
 	this.context = ctx
 	this.scale = 100
@@ -23,6 +21,9 @@ FunctionPloter.prototype.draw = function (view, func, color) {
 		let cordY = -func(cordX) * this.scale
 		//var screenY = (pointY - viewCenterY) * viewScale + heightHalf
 		var scrY = (cordY - centerY) * scale + canvasHeightHalf
+		if (isNaN(scrY) || scrY > canvasHeight || scrY < 0) {
+			continue
+		}
 		context.lineTo(x, scrY)
 	}
 	context.lineWidth = 2
