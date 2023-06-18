@@ -1,5 +1,5 @@
 function GetRect(vertices) {
-    let rt = new [vertices[0], vertices[1], vertices[0], vertices[1]];
+    let rt = [vertices[0], vertices[1], vertices[0], vertices[1]];
     for (var i = 2; i < vertices.length; i += 2) {
         if (vertices[i] > rt[0])
             rt[0] = vertices[i];
