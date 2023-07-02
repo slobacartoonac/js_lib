@@ -13,14 +13,16 @@ class GridPoint {
 }
 
 export function search(startPositions, {
-    getScore,
     isGoal,
     getNeighbors,
     heuristic,
     maxPathLength
 }) {
   let openSet = startPositions.map(pos => {
-    return GridPoint.fromPosition(pos)
+    let point =  GridPoint.fromPosition(pos)
+    point.h = heuristic(point.position)
+    point.f = point.g + point.h;
+    return point
   })
   
   let path = null
@@ -34,11 +36,11 @@ export function search(startPositions, {
         return 0
     })
     let current = openSet.shift();
-    if(isGoal ? isGoal(current) : current.h == 0){
+    if(isGoal ? isGoal(current) : (current.h == 0)){
         path = current
         break;
     }
-    let score = getScore ? getScore(current) : 1 / current.h;
+    let score = 1 / current.h;
     if (score > best) {
       best = score
       console.log("Candidate!");
@@ -51,21 +53,17 @@ export function search(startPositions, {
       continue;
     }
 
-    let neighbors = getNeighbors(current.position).map(GridPoint.fromPosition);
+    let neighbors = getNeighbors(current.position);
     for (let i = 0; i < neighbors.length; i++) {
       let neighbor = neighbors[i];
       if (!closedSet.includes(neighbor)) {
         let possibleG = current.g + 1;
-
-        if (!openSet.includes(neighbor)) {
-          openSet.push(neighbor);
-        } else if (possibleG >= neighbor.g) {
-          continue;
-        }
-        neighbor.g = possibleG;
-        neighbor.h = heuristic(neighbor.position)
-        neighbor.f = neighbor.g + neighbor.h;
-        neighbor.parent = current;
+        let neighborPoint = GridPoint.fromPosition(neighbor)
+        neighborPoint.g = possibleG;
+        neighborPoint.h = heuristic(neighborPoint.position)
+        neighborPoint.f = neighborPoint.g + neighborPoint.h;
+        neighborPoint.parent = current;
+        openSet.push(neighborPoint);
       }
     }
   }
