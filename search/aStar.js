@@ -46,7 +46,7 @@ export function search(startPositions, {
       path = current
     }
     //add current to closedSet
-    closedSet.push(current.position);
+    closedSet.push(current);
     if(maxPathLength && current.g >= maxPathLength - 1){
       continue;
     }
@@ -54,12 +54,14 @@ export function search(startPositions, {
     let neighbors = getNeighbors(current.position);
     for (let i = 0; i < neighbors.length; i++) {
       let neighbor = neighbors[i];
-      if (!closedSet.includes(neighbor)) {
-        let possibleG = current.g + 1;
+      let possibleG = current.g + 1;
+      let possibleH = heuristic(neighbor)
+      let possibleF = possibleG + possibleH;
+      if (!closedSet.find(({position,h})=> neighbor === position && h < possibleH)) {
         let neighborPoint = GridPoint.fromPosition(neighbor)
         neighborPoint.g = possibleG;
-        neighborPoint.h = heuristic(neighborPoint.position)
-        neighborPoint.f = neighborPoint.g + neighborPoint.h;
+        neighborPoint.h = possibleH;
+        neighborPoint.f = possibleF;
         neighborPoint.parent = current;
         openSet.push(neighborPoint);
       }
