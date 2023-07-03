@@ -1,9 +1,9 @@
 class GridPoint {
   constructor(position){
     this.f = 0; //total cost function
-    this.g = 0; //cost function from start to the current grid point
-    this.h = 0; //heuristic estimated cost function from current grid point to the goal
-    this.parent = undefined; // immediate source of the current grid point
+    this.g = 0; //cost function
+    this.h = 0; //heuristic estimated cost 
+    this.parent = undefined; 
     this.position = position;
   }
     static fromPosition(pos){
@@ -12,10 +12,10 @@ class GridPoint {
 }
 
 export function search(startPositions, {
-    isGoal,
     getNeighbors,
     heuristic,
-    maxPathLength
+    maxPathLength,
+    isGoal
 }) {
   let openSet = startPositions.map(pos => {
     let point =  GridPoint.fromPosition(pos)
@@ -28,7 +28,6 @@ export function search(startPositions, {
   let closedSet = []
   let best = - Infinity
   while (openSet.length > 0) {
-    //assumption lowest index is the first one to begin with
     openSet.sort(({f:fA},{f:fB})=>{
         if(fB>fA){return -1}
         if(fA>fB){return 1}
