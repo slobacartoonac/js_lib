@@ -48,6 +48,7 @@ function Touch(div, deadzone) {
 	this.deadzone = deadzone
 	this.clear()
 	let startPosition = null
+	let startTime = null
 	let startMoveSecound = null
 	let position = null
 	let thisMoveSecound = null
@@ -86,6 +87,7 @@ function Touch(div, deadzone) {
 		touch = true;
 		if (startPosition == null) {
 			startPosition = { x: e.x, y: e.y }
+			startTime = +(new Date())
 			position = { x: e.x, y: e.y }
 			this.triger('start', position)
 			click = true
@@ -96,6 +98,7 @@ function Touch(div, deadzone) {
 			if (distance2d(startPosition, secound) < distance2d(startPosition, e)) {
 				//switched touches
 				startPosition = { x: e.x, y: e.y };
+				startTime = +(new Date())
 				position = { x: e.x, y: e.y };
 			}
 			startMoveSecound = { x: secound.x, y: secound.y }
@@ -119,6 +122,7 @@ function Touch(div, deadzone) {
 		let zoom = getZoom(startPosition, position, startMoveSecound, thisMoveSecound)
 		let distance = len2d(direction)
 		let angle = getAngleDelta(startPosition, position, startMoveSecound, thisMoveSecound)
+		let deltaTime = (+(new Date()))-startTime
 		let debug = this.debug && `${startPosition && 'Start: ' + JSON.stringify(startPosition)},
 		${position && 'This: ' + JSON.stringify(position)}, 
 		${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
@@ -144,6 +148,8 @@ function Touch(div, deadzone) {
 			touchSecound,
 			angle,
 			deltaAngle,
+			startTime,
+			deltaTime,
 			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
 			debug,
 			centerPosition: this.centerPosition
@@ -178,6 +184,7 @@ function Touch(div, deadzone) {
 		let zoom = getZoom(startPosition, position, startMoveSecound, thisMoveSecound)
 		let angle = getAngleDelta(startPosition, position, startMoveSecound, thisMoveSecound)
 		let distance = len2d(direction)
+		let deltaTime = (+(new Date()))-startTime
 		let debug = this.debug && `${startPosition && 'Start: ' + JSON.stringify(startPosition)},
 		${position && 'This: ' + JSON.stringify(position)}, 
 		${startMoveSecound && 'Start secound: ' + JSON.stringify(startMoveSecound)}, 
@@ -205,6 +212,8 @@ function Touch(div, deadzone) {
 			touchSecound,
 			angle,
 			deltaAngle,
+			startTime,
+			deltaTime,
 			isPrimary: ((!touchSecound && mouseDown == 0) || mouseDown == 1),
 			debug,
 			centerPosition: this.centerPosition
@@ -224,6 +233,8 @@ function Touch(div, deadzone) {
 		}
 		this.triger('stop', addition)
 		startPosition = null
+		startTime = null
+
 		position = null
 		startMoveSecound = null
 		thisMoveSecound = null
@@ -257,6 +268,9 @@ Touch.prototype.onClick = function (func) {
 }
 Touch.prototype.onForce = function (func) {
 	this.events.force.push(func)
+}
+Touch.prototype.onStart = function (func) {
+	this.events.start.push(func)
 }
 Touch.prototype.onStop = function (func) {
 	this.events.stop.push(func)

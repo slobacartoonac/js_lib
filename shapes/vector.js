@@ -66,14 +66,13 @@ Vector.prototype.add = function (toAdd) {
 }
 
 Vector.prototype.update = function (newValues) {
-	for (var k = 0; k < this.length; k++) {
-		if (!Object.hasOwnProperty.call(this, k)) {
+	let enteries = Object.entries(newValues)
+	for (var k = 0; k < enteries.length; k++) {
+		let enterie = enteries[k]
+		if (!Object.hasOwnProperty.call(this, enterie[0])) {
 			continue;
 		}
-		if (!Object.hasOwnProperty.call(newValues, k)) {
-			continue;
-		}
-		this[k] = newValues[k]
+		this[k] = enterie[1]
 	}
 }
 
