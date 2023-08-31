@@ -38,6 +38,10 @@ function Vector(...array) {
 	});
 }
 
+Vector.from =  function(some){
+	return new Vector(some)
+}
+
 Vector.prototype.x = 0;
 Vector.prototype.y = 0;
 Vector.prototype.z = 0;
