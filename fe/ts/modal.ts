@@ -31,7 +31,7 @@ export function createModal(definition: any) {
 					{
 						className: "modal_input",
 						text: item.label || item,
-						onClick: () => closeModal(item.id || item)
+						onClick: () => closeModal(typeof item.id === 'undefined' ? item : item.id)
 
 					})
 				) : []]
@@ -42,7 +42,7 @@ export function createModal(definition: any) {
 					{
 						className: "modal_button",
 						text: item.label || item,
-						onClick: () => closeModal(item.id || item)
+						onClick: () => closeModal(typeof item.id === 'undefined' ? item : item.id)
 
 					})
 				) : []
