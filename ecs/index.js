@@ -54,6 +54,12 @@ EntityManager.prototype.destroy = function (e) {
 }
 
 EntityManager.prototype.asign = function (component, e) {
+	if(!e){
+		throw Error("Can't asign to "+e)
+	}
+	if(!(e instanceof Entity)){
+		throw Error(e+" is not Entity")
+	}
 	var entity_components = this._components.get(e.id)
 	if (!entity_components) {
 		this._components.set(e.id, new Map([[component.constructor.name, [component]]]))
