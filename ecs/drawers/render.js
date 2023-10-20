@@ -7,6 +7,8 @@ import { ShapeRounded } from '../../shapes/rounded-box.js'
 import { TransformRotate } from '../physics/transformRotate.js'
 import { ShapeNoScale } from '../../shapes/noScale.js'
 import { ShapeScale } from '../../shapes/scale.js'
+import { TileSprite } from '../../shapes/tile-sprite.js'
+import { TileRenderEngine } from './tiler.js'
 
 function Renderer(color, stroke, layer) {
 	this.color = color
@@ -119,7 +121,7 @@ RenderEngine.prototype.draw = function (view) {
 				let sprite = sprites[i];
 				let box = boxes[0];
 				let spriteWith = box?.x || sprite.image.width
-				let spriteHeight = box?.x || sprite.image.height
+				let spriteHeight = box?.y || sprite.image.height
 				const size_x = spriteWith * scaleWith > 1 ? spriteWith * scaleWith + 0.5 : 1
 				const size_y = spriteHeight * scaleWith > 1 ? spriteHeight * scaleWith + 0.5 : 1
 				context.save();
@@ -131,6 +133,24 @@ RenderEngine.prototype.draw = function (view) {
 				context.drawImage(sprite.image, x, y, size_x, size_y);
 				context.restore();
 			}
+			let tileSprites = this.manager.get(TileSprite, elem)
+			tileSprites.forEach(sprite => {
+				let box = boxes[0];
+				let spriteWith = box?.x || sprite.image.width
+				let spriteHeight = box?.y || sprite.image.height
+				const size_x = spriteWith * scaleWith > 1 ? spriteWith * scaleWith + 0.5 : 1
+				const sX = size_x / spriteWith
+				const size_y = spriteHeight * scaleWith > 1 ? spriteHeight * scaleWith + 0.5 : 1
+				context.save();
+				if (rotate) {
+					context.translate(x + size_x / 2, y + size_y / 2);
+					context.rotate(rotate.rotate);
+					context.translate(-x - size_x / 2, -y - size_y / 2);
+				}
+				context.translate(x, y)
+				TileRenderEngine.render.call(this, sprite.image, size_x, size_y, sprite.x*sX, sprite.y*sX, context)
+				context.restore();
+			});
 			let texts = this.manager.get(ShapeText, elem)
 			for (let i in texts) {
 				let text = texts[i]
@@ -146,6 +166,7 @@ RenderEngine.prototype.draw = function (view) {
 				context.fillText(text.text, x, y + parseInt(size_y));
 				context.restore();
 			}
+
 		}
 	)
 	if (angle) {
