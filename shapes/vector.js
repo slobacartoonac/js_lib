@@ -105,6 +105,7 @@ Vector.prototype.magnitude = function () {
 }
 Vector.prototype.normalise = function (toAdd) {
 	let magnitude = this.magnitude()
+	if(!magnitude) return this.scale(0)
 	return this.scale(1 / magnitude)
 }
 Vector.prototype.scale = function (scale) {
@@ -119,7 +120,7 @@ Vector.prototype.scale = function (scale) {
 }
 
 Vector.prototype.copy = function () {
-	return new this.constructor(this)
+	return new Vector(this)
 }
 
 export { Vector }

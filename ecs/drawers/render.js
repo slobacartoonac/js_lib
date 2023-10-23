@@ -34,7 +34,7 @@ function shapeDone(context, renderer) {
 	}
 }
 
-function roundedRect(context, x, y, width, height, radius) {
+export function roundedRect(context, x, y, width, height, radius) {
 	context.moveTo(x, y + radius);
 	context.lineTo(x, y + height - radius);
 	context.arcTo(x, y + height, x + radius, y + height, radius);
