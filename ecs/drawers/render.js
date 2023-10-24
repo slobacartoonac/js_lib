@@ -75,9 +75,16 @@ RenderEngine.prototype.draw = function (view) {
 	}
 	).map(
 		([elem, renderer]) => {
-			var transform = this.manager.get(Transform, elem)[0]
-			var x = (transform.positions[0] - centerX) * scale + canvasWidthHalf
-			var y = (transform.positions[1] - centerY) * scale + canvasHeightHalf
+			var transform = this.manager.get(Transform, elem).reduce(
+				(acc, elem)=>{
+					acc[0]+=elem.positions[0]
+					acc[1]+=elem.positions[1]
+					return acc
+				}, [0, 0]
+			)
+			
+			var x = (transform[0] - centerX) * scale + canvasWidthHalf
+			var y = (transform[1] - centerY) * scale + canvasHeightHalf
 			if (x < -maxSize || y < -maxSize || x > canvasWidth || y > canvasHeight)
 				return
 

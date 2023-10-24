@@ -1,15 +1,23 @@
+let toLoad = []
+
 function imageIsLoaded(img, callback){
-    console.log("loadi image", img)
+    toLoad.push(callback)
     if (img.complete) {
-        callback(img)
+        while(toLoad.length){
+            toLoad.shift()(img)
+        }
       } else {
         img.onload = function() {
-            callback(img)
+            while(toLoad.length){
+                toLoad.shift()(img)
+            }
         };
         
         img.onerror = function(err) {
           console.log('Image failed to load.', img, err);
-          callback(null)
+            while(toLoad.length){
+                toLoad.shift()(null)
+            }
         };
       }
 }
