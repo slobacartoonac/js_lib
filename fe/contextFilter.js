@@ -1,22 +1,28 @@
-let toLoad = []
+let toLoad = {
+
+}
 
 function imageIsLoaded(img, callback){
-    toLoad.push(callback)
+    if(toLoad[img.src])
+        toLoad[img.src].push(callback)
+    else{
+        toLoad[img.src]=[callback]
+    }
     if (img.complete) {
-        while(toLoad.length){
-            toLoad.shift()(img)
+        while(toLoad[img.src].length){
+            toLoad[img.src].shift()(img)
         }
       } else {
         img.onload = function() {
-            while(toLoad.length){
-                toLoad.shift()(img)
+            while(toLoad[img.src].length){
+                toLoad[img.src].shift()(img)
             }
         };
         
         img.onerror = function(err) {
           console.log('Image failed to load.', img, err);
-            while(toLoad.length){
-                toLoad.shift()(null)
+            while(toLoad[img.src].length){
+                toLoad[img.src].shift()(null)
             }
         };
       }
