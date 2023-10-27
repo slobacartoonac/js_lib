@@ -42,6 +42,33 @@ function lineCollision(A1, A2,
     return true;
 }
 
+function lineCollisionPoint2(A, B,
+    C, D, Ecalc = 0.001) {
+   // Line AB represented as a1x + b1y = c1
+   let a = B.y - A.y;
+   let b = A.x - B.x;
+   let c = a*(A.x) + b*(A.y);
+   // Line CD represented as a2x + b2y = c2
+   let a1 = D.y - C.y;
+   let b1 = C.x - D.x;
+   let c1 = a1*(C.x)+ b1*(C.y);
+   let det = a*b1 - a1*b;
+   if (det != 0){
+      let x = (b1*c - b*c1)/det;
+      let y = (a*c1 - a1*c)/det;
+            // Check if the intersection point is within the bounds of line segment AB
+            if (x + Ecalc >= Math.min(A.x, B.x) && x <= Math.max(A.x, B.x) + Ecalc &&
+            y + Ecalc >= Math.min(A.y, B.y) && y <= Math.max(A.y, B.y) + Ecalc &&
+          // Check if the intersection point is within the bounds of line segment CD
+            x + Ecalc >= Math.min(C.x, D.x) && x <= Math.max(C.x, D.x) + Ecalc &&
+            y + Ecalc >= Math.min(C.y, D.y) && y <= Math.max(C.y, D.y) + Ecalc) {
+            return { x, y };
+          }
+   }
+   return null
+}
+
+
 function interpolateVecs(vecA, vecB, over) {
     let left = 1 - over
     return { x: vecA.x * left + vecB.x * over, y: vecA.y * left + vecB.y * over }
@@ -63,6 +90,7 @@ export {
     dot,
     perpDot,
     lineCollision,
+    lineCollisionPoint2,
     sign,
     interpolateVecs,
     interpolate,
