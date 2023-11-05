@@ -41,7 +41,7 @@ export function search(startPositions, {
     let score = 1 / current.h;
     if (score > best) {
       best = score
-      console.log("Candidate!");
+      // console.log("Candidate!");
       // return the traced path
       path = current
     }

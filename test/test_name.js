@@ -23,7 +23,7 @@ describe('const tests', function () {
 
     it('Create and test', function () {
         let test = new Vec2(1).scale(2);
-        assert.equal(test.constructor.name, "Vec2")
+        assert.equal(test.constructor.name, "Vector")
     });
 
 })

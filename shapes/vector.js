@@ -1,12 +1,8 @@
-function Vector(...array) {
+function Vector() {
+	const array = [...arguments];
 	Array.call(this)
 	if (array.length == 1) {
-		var item = array[0]
-		var arr = Object.values(item)
-		if (Object.hasOwnProperty.call(item, 'length') &&
-			item.length !== arr.length) {
-			arr.pop()
-		}
+		var arr = Object.values(array[0])
 		this.push(...arr)
 	} else {
 		this.push(...Object.values(array))
@@ -36,6 +32,11 @@ function Vector(...array) {
 			this[2] = value;
 		}
 	});
+	// Make 'length' property non-enumerable
+	Object.defineProperty(this, 'length', {
+		enumerable: false,
+		writable: true,
+	  });
 }
 
 Vector.from =  function(some){
@@ -57,10 +58,7 @@ Vector.prototype = Object.create(Array.prototype, {
 
 Vector.prototype.add = function (toAdd) {
 	let ret = this.copy()
-	for (var k = 0; k < ret.length; k++) {
-		if (!Object.hasOwnProperty.call(ret, k)) {
-			continue;
-		}
+	for (var k in ret) {
 		if (!Object.hasOwnProperty.call(toAdd, k)) {
 			continue;
 		}
@@ -68,6 +66,10 @@ Vector.prototype.add = function (toAdd) {
 	}
 	return ret
 }
+
+Object.defineProperty(Vector.prototype, 'add', {
+	enumerable: false,
+  });
 
 Vector.prototype.update = function (newValues) {
 	let enteries = Object.entries(newValues)
@@ -80,47 +82,75 @@ Vector.prototype.update = function (newValues) {
 	}
 }
 
+Object.defineProperty(Vector.prototype, 'update', {
+	enumerable: false,
+});
+
 Vector.prototype.negate = function () {
 	let ret = this.copy()
-	for (var k = 0; k < ret.length; k++) {
-		if (!Object.hasOwnProperty.call(ret, k)) {
-			continue;
-		}
+	for (var k in this) {
 		ret[k] = -ret[k]
 	}
 	return ret
 }
+
+Object.defineProperty(Vector.prototype, 'negate', {
+	enumerable: false,
+});
+
 Vector.prototype.substract = function (toAdd) {
 	return this.add(toAdd.negate())
 }
+
+Object.defineProperty(Vector.prototype, 'substract', {
+	enumerable: false,
+});
+
+
 Vector.prototype.magnitude = function () {
 	let magnitude = 0;
-	for (var k = 0; k < this.length; k++) {
-		if (!Object.hasOwnProperty.call(this, k)) {
-			continue;
-		}
-		magnitude += this[k] * this[k]
+	for (var dim of this) {
+		magnitude += dim * dim
 	}
 	return Math.sqrt(magnitude);
 }
+
+Object.defineProperty(Vector.prototype, 'magnitude', {
+	enumerable: false,
+});
+
+
 Vector.prototype.normalise = function (toAdd) {
 	let magnitude = this.magnitude()
 	if(!magnitude) return this.scale(0)
 	return this.scale(1 / magnitude)
 }
+
+Object.defineProperty(Vector.prototype, 'normalise', {
+	enumerable: false,
+});
+
+
 Vector.prototype.scale = function (scale) {
 	let ret = this.copy()
-	for (var k = 0; k < ret.length; k++) {
-		if (!Object.hasOwnProperty.call(ret, k)) {
-			continue;
-		}
+	for (var k in this) {
 		ret[k] *= scale
 	}
 	return ret
 }
 
+Object.defineProperty(Vector.prototype, 'scale', {
+	enumerable: false,
+});
+
+
 Vector.prototype.copy = function () {
 	return new Vector(this)
 }
+
+Object.defineProperty(Vector.prototype, 'copy', {
+	enumerable: false,
+});
+
 
 export { Vector }

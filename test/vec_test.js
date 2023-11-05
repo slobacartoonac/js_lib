@@ -92,6 +92,17 @@ describe('Shape vector', function () {
 		assert.ok(Math.abs((res.x * v13.magnitude() - v13.x)) < Number.EPSILON)
 		assert.ok(Math.abs((res.y * v13.magnitude() - v13.y)) < Number.EPSILON)
 	})
+	it('test iterate trough', function () {
+		let arr14 = [3, 2]
+		var v14 = new Vector({x: 3, y:2})
+		for(var i in v14){
+			console.log(i)
+			let vCord = v14[i]
+			let aCord = arr14[i]
+			console.log(i,vCord, aCord)
+			assert.equal(vCord, aCord)
+		}
+	})
 })
 
 describe('Point in triangle', function () {
