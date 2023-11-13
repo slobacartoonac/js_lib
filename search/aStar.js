@@ -15,7 +15,8 @@ export function search(startPositions, {
     getNeighbors,
     heuristic,
     maxPathLength,
-    isGoal
+    isGoal,
+    allowDeep
 }) {
   let openSet = startPositions.map(pos => {
     let point =  GridPoint.fromPosition(pos)
@@ -26,27 +27,33 @@ export function search(startPositions, {
   
   let path = null
   let closedSet = []
-  let best = - Infinity
+  let best = Infinity
   while (openSet.length > 0) {
+    
     openSet.sort(({f:fA},{f:fB})=>{
         if(fB>fA){return -1}
         if(fA>fB){return 1}
         return 0
     })
+    if(!allowDeep){
+      openSet.splice(200)
+    }
     let current = openSet.shift();
-    if(isGoal ? isGoal(current) : (current.h == 0)){
+    closedSet.push(current);
+    if(current.position === null || current.position === undefined){
+      continue
+    }
+    if(isGoal ? isGoal(current.position) : (current.h == 0)){
         path = current
         break;
     }
-    let score = 1 / current.h;
-    if (score > best) {
-      best = score
-      // console.log("Candidate!");
+    if (current.h < best) {
+      best = current.h
+      console.log("Candidate!");
       // return the traced path
       path = current
     }
     //add current to closedSet
-    closedSet.push(current);
     if(maxPathLength && current.g >= maxPathLength - 1){
       continue;
     }

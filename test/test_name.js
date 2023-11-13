@@ -21,7 +21,7 @@ describe('const tests', function () {
         assert.equal(test.constructor.name, "Vector")
     });
 
-    it('Create and test', function () {
+    it('Create and test 1', function () {
         let test = new Vec2(1).scale(2);
         assert.equal(test.constructor.name, "Vector")
     });
