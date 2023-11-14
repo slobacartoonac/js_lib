@@ -15,26 +15,16 @@ describe('EntityManager', function () {
 	it('should create entity', function () {
 		var manager = new EntityManager()
 		var a = manager.create()
-		assert.equal(a.generation(), 0)
-		assert.equal(a.index(), 0)
 		var b = manager.create()
-		assert.equal(b.generation(), 0)
-		assert.equal(b.index(), 1)
 	})
 	it('should create entity, delete entity, overide entity', function () {
 		var manager = new EntityManager()
 		var a = manager.create()
-		assert.equal(a.generation(), 0)
-		assert.equal(a.index(), 0)
 		var b = manager.create()
-		assert.equal(b.generation(), 0)
-		assert.equal(b.index(), 1)
 		manager.destroy(a)
 		assert.ok(!manager.alive(a))
 		assert.ok(manager.alive(b))
 		var c = manager.create()
-		assert.equal(c.generation(), 1)
-		assert.equal(c.index(), 0)
 		assert.ok(!manager.alive(a))
 	})
 
@@ -45,8 +35,6 @@ describe('EntityManager', function () {
 		Component.prototype.f = function () { this.a++ }
 		var manager = new EntityManager()
 		var entity = manager.create()
-		assert.equal(entity.generation(), 0)
-		assert.equal(entity.index(), 0)
 		var component = new Component(5)
 		manager.asign(component, entity)
 		var component_array = manager.get(Component, entity)
@@ -59,6 +47,8 @@ describe('EntityManager', function () {
 		manager.asign(new Component(3), entity)
 		manager.remove(component, entity)
 		assert.equal(manager.get(Component, entity).length, 1)
+		manager.destroy(entity)
+		assert.equal(manager.get(Component, entity).length, 0)
 	})
 	it('it should add 2 components', function () {
 		function Component(a) {

@@ -1,56 +1,29 @@
-const ENTITY_INDEX_BITS = 22
-const ENTITY_INDEX_MASK = (1 << ENTITY_INDEX_BITS) - 1
-
-const ENTITY_GENERATION_BITS = 8
-const ENTITY_GENERATION_MASK = (1 << ENTITY_GENERATION_BITS) - 1
-const MINIMUM_FREE_INDICES = 0
-
-function Entity(id) {
-	this.id = id
-}
-Entity.prototype.index = function () {
-	return this.id & ENTITY_INDEX_MASK
-}
-Entity.prototype.generation = function () {
-	return (this.id >> ENTITY_INDEX_BITS) & ENTITY_GENERATION_MASK
-}
+function Entity() {}
 
 function EntityManager() {
-	this._generation = new Map()
-	this._free_indices = []
-	this._entities = new Map()
+	this._entities = new Set()
 	this._components = new Map()
 	this.__entities_with_type = new Map()
 }
 
 EntityManager.prototype.create = function () {
-	var idx = 0
-	if (this._free_indices.length > MINIMUM_FREE_INDICES) {
-		idx = this._free_indices.shift()
-	} else {
-		idx = this._generation.size
-		this._generation.set(idx, 0)
-	}
-	var entity = this.make_entity(idx, this._generation.get(idx))
-	this._entities.set(idx, entity)
+	var entity = this.make_entity()
+	this._entities.add(entity)
+	this._components.set(entity, new Map())
 	return entity
 }
 
-EntityManager.prototype.make_entity = function (idx, generation) {
-	return new Entity(idx + (generation << ENTITY_INDEX_BITS))
+EntityManager.prototype.make_entity = function () {
+	return new Entity()
 }
 
 EntityManager.prototype.alive = function (e) {
-	return this._generation.get(e.index()) == e.generation()
+	return this._entities.has(e)
 }
 
 EntityManager.prototype.destroy = function (e) {
-	this._components.delete(e.id)
-	this._entities.delete(e.id)
-	let index = e.index()
-	let generation = this._generation.get(index) + 1
-	this._generation.set(index, generation)
-	this._free_indices.push(index)
+	this._components.delete(e)
+	this._entities.delete(e)
 }
 
 EntityManager.prototype.asign = function (component, e) {
@@ -60,26 +33,27 @@ EntityManager.prototype.asign = function (component, e) {
 	if(!(e instanceof Entity)){
 		throw Error(e+" is not Entity")
 	}
-	var entity_components = this._components.get(e.id)
+	var entity_components = this._components.get(e)
 	if (!entity_components) {
-		this._components.set(e.id, new Map([[component.constructor.name, [component]]]))
+		throw Error(e+" not Entity form this set")
 		return
 	}
 	var components_of_type = entity_components.get(component.constructor.name);
 	if (!components_of_type) {
-		let elComponents = this._components.get(e.id)
+		let elComponents = this._components.get(e)
 		elComponents.set(component.constructor.name, [component])
 		return
 	}
 	if (components_of_type &&
 		entity_components.get(component.constructor.name).find(comp => component === comp)
-	)
+	){
 		throw Error('Component is allready asiged')
-	entity_components.get(component.constructor.name).push(component)
+	}
+	components_of_type.push(component)
 }
 
 EntityManager.prototype.get = function (c_type, e) {
-	var entity_components = this._components.get(e.id)
+	var entity_components = this._components.get(e)
 	if (!entity_components) {
 		return []
 	}
@@ -91,7 +65,7 @@ EntityManager.prototype.get = function (c_type, e) {
 }
 
 EntityManager.prototype.remove = function (component, e) {
-	var entity_components = this._components.get(e.id)
+	var entity_components = this._components.get(e)
 	if (!entity_components) {
 		return
 	}

@@ -1,6 +1,4 @@
 export interface Entity {
-    index(): number;
-    generation(): number;
   }
   
 declare class EntityManager {
