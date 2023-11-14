@@ -3,7 +3,6 @@ function Entity() {}
 function EntityManager() {
 	this._entities = new Set()
 	this._components = new Map()
-	this.__entities_with_type = new Map()
 }
 
 EntityManager.prototype.create = function () {
