@@ -41,15 +41,15 @@ EntityManager.prototype.asign = function (component, e) {
 	var components_of_type = entity_components.get(component.constructor.name);
 	if (!components_of_type) {
 		let elComponents = this._components.get(e)
-		elComponents.set(component.constructor.name, [component])
+		elComponents.set(component.constructor.name, new Set([component]))
 		return
 	}
 	if (components_of_type &&
-		entity_components.get(component.constructor.name).find(comp => component === comp)
+		entity_components.get(component.constructor.name).has(component)
 	){
 		throw Error('Component is allready asiged')
 	}
-	components_of_type.push(component)
+	components_of_type.add(component)
 }
 
 EntityManager.prototype.get = function (c_type, e) {
@@ -61,7 +61,7 @@ EntityManager.prototype.get = function (c_type, e) {
 	if (!components_of_type) {
 		return []
 	}
-	return components_of_type
+	return Array.from(components_of_type)
 }
 
 EntityManager.prototype.remove = function (component, e) {
@@ -73,9 +73,7 @@ EntityManager.prototype.remove = function (component, e) {
 	if (!components_of_type) {
 		return
 	}
-	entity_components.set(component.constructor.name, entity_components.get(component.constructor.name).filter(function (compon) {
-		return compon !== component
-	}))
+	components_of_type.delete(component)
 }
 
 EntityManager.prototype.getEnities = function (c_type) {
