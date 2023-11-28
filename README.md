@@ -102,4 +102,4 @@ Math for boxes, vectors, functions and view
 
 ## Usage
 
-Best way to get yourself familiar with usage of this libraries is to look at [Test folder](tree/main/test)
+Best way to get yourself familiar with usage of this libraries is to look at [Test folder](https://github.com/slobacartoonac/js_lib/tree/main/test)
