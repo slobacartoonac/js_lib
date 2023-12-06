@@ -1,4 +1,4 @@
-declare module "word-difference-calculator" {
+
   export type WeightFactors = {
     case?: number;
     position?: number;
@@ -19,4 +19,3 @@ declare module "word-difference-calculator" {
     secondString: string,
     firstIndex: number
   ): [number, number, number];
-}
