@@ -27,7 +27,21 @@ export const record3sec = (timeout) => new Promise(function (res, rej) {
         setTimeout(()=>mediaRecorder.stop(), timeout)
 });
 
-export const takeScreenshot = (type) => {
+export const takeScreenshot = (type, download) => {
     var canvas = document.getElementsByTagName("canvas")[0];
-    return canvas.toDataURL(type || 'png');
+    var imgUrl = canvas.toDataURL(type || 'png');
+    if(download){            
+        // Create an anchor element
+        var a = document.createElement('a');
+        
+        // Set the href attribute to the image URL
+        a.href = imgUrl;
+        
+        // Set the download attribute to force download
+        a.download = 'image.' + type || 'png'
+        
+        // Trigger a click event on the anchor element
+        a.click();
+    }
+    return imgUrl;
 }
