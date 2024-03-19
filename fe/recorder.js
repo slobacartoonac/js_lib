@@ -26,3 +26,8 @@ export const record3sec = (timeout) => new Promise(function (res, rej) {
     if(timeout)
         setTimeout(()=>mediaRecorder.stop(), timeout)
 });
+
+export const takeScreenshot = (type) => {
+    var canvas = document.getElementsByTagName("canvas")[0];
+    return canvas.toDataURL(type || 'png');
+}
