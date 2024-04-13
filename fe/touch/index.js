@@ -63,7 +63,7 @@ function Touch(div, deadzone) {
 	this.last_error = ''
 	const moveTouchT = (e) => {
 		e.preventDefault()
-		const { top, left } = e.target.getBoundingClientRect()
+		const { top, left } = e.currentTarget.getBoundingClientRect()
 		if (e.touches[1] && e.touches[0]) {
 			let first = { x: e.touches[0].clientX - left, y: e.touches[0].clientY - top }
 			let secound = { x: e.touches[1].clientX - left, y: e.touches[1].clientY - top }
@@ -78,7 +78,7 @@ function Touch(div, deadzone) {
 	}
 	const moveTouchM = (e) => {
 		e.preventDefault()
-		const { top, left } = e.target.getBoundingClientRect()
+		const { top, left } = e.currentTarget.getBoundingClientRect()
 		this.centerPosition = { x: e.clientX - left, y: e.clientY - top }
 		if (mouseDown) moveTouch({ x: e.clientX - left, y: e.clientY - top })
 	}
