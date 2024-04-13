@@ -1,0 +1,12 @@
+{
+    "name": "touch-and-mouse",
+    "version": "1.0.0",
+    "description": "A library for touch and mouse related functionalities.",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": ["touch", "mouse", "library"],
+    "author": "Slobodan Zivkovic",
+    "license": "MIT"
+  }
