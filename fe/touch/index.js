@@ -326,4 +326,4 @@ Touch.prototype.triger = function (ev, args) {
 		})
 }
 
-export default Touch
+export { Touch as default}
