@@ -1,4 +1,4 @@
-import Touch from 'touch-and-mouse';
+import Touch from '../touch';
 
 /**
  * Initializes the carousel functionality for the specified selector.
