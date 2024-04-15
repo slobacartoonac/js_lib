@@ -27,7 +27,7 @@ function initCarousel(selector){
     const paddingRight = parseFloat(paddingStyle.paddingRight);
 
     // Add x to the current margin left
-    const newMarginLeft = currentMarginLeft + x;
+    let newMarginLeft = currentMarginLeft + x;
     if (newMarginLeft > 0) {
       return;
     }
@@ -37,7 +37,7 @@ function initCarousel(selector){
       paddingRight;
 
     if (newMarginLeft < toScroll) {
-      return;
+        newMarginLeft = Math.min(toScroll, 0);
     }
     
     // Set the new margin left as a string with 'px' unit
@@ -59,7 +59,7 @@ function initCarousel(selector){
     const paddingBottom = parseFloat(paddingStyle.paddingBottom);
     
     // Add y to the current margin top
-    const newMarginTop = currentMarginTop + y;
+    let newMarginTop = currentMarginTop + y;
     if(newMarginTop > 0){
       return
     }
@@ -68,8 +68,8 @@ function initCarousel(selector){
       paddingTop -
       paddingBottom;
     
-    if(newMarginTop < toScroll){
-      return
+    if (newMarginTop < toScroll) {
+        newMarginTop = Math.min(toScroll, 0);
     }
     
     // Set the new margin top as a string with 'px' unit
