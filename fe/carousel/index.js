@@ -79,6 +79,7 @@ function initCarousel(selector){
 
   carouselsOuter.forEach(carouselOuter => {
     let touch  = new Touch(carouselOuter);
+    touch.preventDefault = false;
     
     touch.onForce(({delta:{x, y}}) => {
       carouselByX(carouselOuter, x);
