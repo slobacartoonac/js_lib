@@ -61,8 +61,11 @@ function Touch(div, deadzone) {
 	this.console_error = false;
 	this.throw_error = false;
 	this.last_error = ''
+	this.preventDefault = true;
 	const moveTouchT = (e) => {
-		e.preventDefault()
+		if (this.preventDefault) {
+			e.preventDefault();
+		}
 		const { top, left } = e.currentTarget.getBoundingClientRect()
 		if (e.touches[1] && e.touches[0]) {
 			let first = { x: e.touches[0].clientX - left, y: e.touches[0].clientY - top }
@@ -77,7 +80,9 @@ function Touch(div, deadzone) {
 		}
 	}
 	const moveTouchM = (e) => {
-		e.preventDefault()
+		if (this.preventDefault) {
+			e.preventDefault();
+		}
 		const { top, left } = e.currentTarget.getBoundingClientRect()
 		this.centerPosition = { x: e.clientX - left, y: e.clientY - top }
 		if (mouseDown) moveTouch({ x: e.clientX - left, y: e.clientY - top })
@@ -173,7 +178,9 @@ function Touch(div, deadzone) {
 	}
 	//= {up:[],down:[],left:[],right:[],stop:[],click:[],force:[]}
 	const stopTouch = (e) => {
-		e.preventDefault()
+		if (this.preventDefault) {
+			e.preventDefault();
+		}
 		if (touch == false) {
 			return
 		}
@@ -240,13 +247,6 @@ function Touch(div, deadzone) {
 		thisMoveSecound = null
 		mouseDown = 0
 	}
-	div.addEventListener(
-		'touchstart',
-		e => {
-			e.preventDefault()
-		},
-		false,
-	)
 	div.addEventListener('touchmove', moveTouchT, false)
 	div.addEventListener('touchend', stopTouch, false)
 	div.addEventListener('touchstart', moveTouchT, false)
