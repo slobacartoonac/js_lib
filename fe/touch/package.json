@@ -1,6 +1,6 @@
 {
     "name": "touch-and-mouse",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "description": "A library for touch and mouse related functionalities.",
     "main": "index.js",
     "scripts": {
