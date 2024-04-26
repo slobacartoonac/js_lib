@@ -78,10 +78,15 @@ function Touch(div, deadzone) {
 			this.centerPosition = { x: first.x, y: first.y }
 			return moveTouch(first)
 		}
+		return stopTouch(e)
 	}
 	const moveTouchM = (e) => {
 		if (this.preventDefault) {
 			e.preventDefault();
+		}
+		if(e.buttons === 0){
+			stopTouch(e)
+			return;
 		}
 		const { top, left } = e.currentTarget.getBoundingClientRect()
 		this.centerPosition = { x: e.clientX - left, y: e.clientY - top }
