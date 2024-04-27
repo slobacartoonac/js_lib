@@ -90,7 +90,12 @@ function Touch(div, deadzone) {
 		}
 		const { top, left } = e.currentTarget.getBoundingClientRect()
 		this.centerPosition = { x: e.clientX - left, y: e.clientY - top }
-		if (mouseDown) moveTouch({ x: e.clientX - left, y: e.clientY - top })
+		if (mouseDown){
+			if(e.type == 'drag' && e.clientX == 0 && e.clientY == 0){
+				return
+			}
+			moveTouch({ x: e.clientX - left, y: e.clientY - top })
+		} 
 	}
 
 	const moveTouch = (e, secound) => {
@@ -257,6 +262,7 @@ function Touch(div, deadzone) {
 	div.addEventListener('touchstart', moveTouchT, false)
 	div.addEventListener('mouseleave', stopTouch, false)
 	div.addEventListener('mousemove', moveTouchM)
+	div.addEventListener('drag', moveTouchM)
 	div.addEventListener('mouseup', stopTouch)
 	div.addEventListener('mousedown', e => {
 		mouseDown = 1 + e.button;
