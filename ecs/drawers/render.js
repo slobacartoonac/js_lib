@@ -9,6 +9,16 @@ import { ShapeNoScale } from '../../shapes/noScale.js'
 import { ShapeScale } from '../../shapes/scale.js'
 import { TileSprite } from '../../shapes/tile-sprite.js'
 import { TileRenderEngine } from './tiler.js'
+import { ShapeLineTo } from 'js_lib/shapes/shape-line.js'
+
+/**
+ * Represents a renderer object.
+ *
+ * @constructor
+ * @param {string} [color] - The color of the renderer.
+ * @param {{color: string, width: number}} [stroke] - The stroke of the renderer.
+ * @param {number} [layer=0] - The layer of the renderer.
+ */
 
 function Renderer(color, stroke, layer) {
 	this.color = color
@@ -60,10 +70,27 @@ RenderEngine.prototype.draw = function (view) {
 		context.rotate(angle);
 		context.translate(-canvasWidthHalf, -canvasHeightHalf);
 	}
-	this.manager.getEnities(Renderer).map(elem => {
+
+	let keyValueList = this.manager.getEnities(Renderer).map(elem => {
 		var renderer = this.manager.get(Renderer, elem)[0]
 		return [elem, renderer]
-	}).sort(([, a], [, b]) => {
+	})
+
+	let localtionMap = new Map(keyValueList.map(([elem])=>{
+		var transform = this.manager.get(Transform, elem).reduce(
+			(acc, elem)=>{
+				acc[0]+=elem.positions[0]
+				acc[1]+=elem.positions[1]
+				return acc
+			}, [0, 0]
+		)
+		
+		var x = (transform[0] - centerX) * scale + canvasWidthHalf
+		var y = (transform[1] - centerY) * scale + canvasHeightHalf
+		return [elem, {x, y}]
+	}))
+	
+	keyValueList.sort(([, a], [, b]) => {
 		if (a.layer < b.layer) {
 			return -1;
 		}
@@ -75,16 +102,9 @@ RenderEngine.prototype.draw = function (view) {
 	}
 	).map(
 		([elem, renderer]) => {
-			var transform = this.manager.get(Transform, elem).reduce(
-				(acc, elem)=>{
-					acc[0]+=elem.positions[0]
-					acc[1]+=elem.positions[1]
-					return acc
-				}, [0, 0]
-			)
-			
-			var x = (transform[0] - centerX) * scale + canvasWidthHalf
-			var y = (transform[1] - centerY) * scale + canvasHeightHalf
+
+			let {x, y} = localtionMap.get(elem)
+
 			if (x < -maxSize || y < -maxSize || x > canvasWidth || y > canvasHeight)
 				return
 
@@ -101,8 +121,20 @@ RenderEngine.prototype.draw = function (view) {
 				shapeDone(context, renderer);
 			}
 			let boxes = this.manager.get(ShapeBox, elem)
+			let lines = this.manager.get(ShapeLineTo, elem)
 			let rounded = this.manager.get(ShapeRounded, elem)
 			let rotate = this.manager.get(TransformRotate, elem)[0]
+			for (let i in lines) {
+				let line = lines[i];
+				if(!localtionMap.has(line.to)) continue
+				let lineTo = localtionMap.get(line.to)
+				context.beginPath();
+				context.moveTo(x, y);
+				context.lineTo(lineTo.x, lineTo.y);
+				context.closePath();
+				shapeDone(context, renderer);
+			}
+
 			for (let i in boxes) {
 				let box = boxes[i];
 				const size_x = box.x * scaleWith > 1 ? box.x * scaleWith : 1

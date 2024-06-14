@@ -47,6 +47,7 @@ ScreenPosition.prototype.zoom = function (scaleFactor, x, y) {
 
 ScreenPosition.prototype.rotate = function (angle) {
     this.angle += angle
+    this.saveToLocalStorage()
 }
 
 
@@ -66,6 +67,26 @@ ScreenPosition.prototype.move = function (x, y) {
     }
     if (!isNaN(this.maxY) && this.y > this.maxY) {
         this.y = this.maxY
+    }
+
+    this.saveToLocalStorage()
+}
+
+ScreenPosition.prototype.loadFromLocalStorage = function (localStorageKey) {
+    this.localStorageKey = localStorageKey
+    let data = localStorage.getItem(this.localStorageKey)
+    if (data) {
+        let newObject = JSON.parse(data)
+        this[0] =  newObject[0] || 0
+        this[1] =  newObject[1] || 0
+        this[2] =  newObject[2] || 1
+        this[3] =  newObject[3] || 0
+    }
+}
+
+ScreenPosition.prototype.saveToLocalStorage = function () {
+    if (this.localStorageKey) {
+        localStorage.setItem(this.localStorageKey, JSON.stringify(this))
     }
 }
 
