@@ -9,7 +9,7 @@ import { ShapeNoScale } from '../../shapes/noScale.js'
 import { ShapeScale } from '../../shapes/scale.js'
 import { TileSprite } from '../../shapes/tile-sprite.js'
 import { TileRenderEngine } from './tiler.js'
-import { ShapeLineTo } from 'js_lib/shapes/shape-line.js'
+import { ShapeLineTo } from '../../shapes/shape-line.js'
 
 /**
  * Represents a renderer object.
