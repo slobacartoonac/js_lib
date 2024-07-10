@@ -18,6 +18,9 @@ function Adjust(type) {
     }
 
     this.publish = (arg) => {
+        if(!arg.constructor){
+            throw Error(`arg ${arg} is not an object`)
+        }
         if (this.type && this.type.name !== arg.constructor.name) {
             throw Error(`arg ${arg} type ${arg.constructor.name} is not type of ${this.type.name}`)
         }
