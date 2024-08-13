@@ -125,7 +125,79 @@ class SliderComponent extends HTMLElement {
   }
 }
 
+class CheckboxComponent extends HTMLElement {
+  constructor(config) {
+    super();
+
+    // Create a shadow root
+    const shadow = this.attachShadow({ mode: 'open' });
+
+    // Ensure the floating window is created
+    if (!globalFloatingWindow) {
+      new FloatingWindow();
+    }
+
+    // Add styles to the shadow DOM
+    const style = document.createElement('style');
+    style.textContent = `
+      .checkbox-container {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+      }
+      .checkbox-label {
+        width: 80px; /* Fixed width for all labels */
+        margin-right: 10px;
+        font-weight: bold;
+        text-align: right; /* Align text to the right */
+      }
+      .checkbox {
+        margin-right: 10px;
+      }
+    `;
+    shadow.appendChild(style);
+
+    // Function to create a checkbox
+    function createCheckbox({ label, id, checked, onchange }) {
+      const container = document.createElement('div');
+      container.classList.add('checkbox-container');
+
+      if (label) {
+        const labelElem = document.createElement('label');
+        labelElem.classList.add('checkbox-label');
+        labelElem.setAttribute('for', id);
+        labelElem.textContent = label;
+        container.appendChild(labelElem);
+      }
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      if (id) {
+        checkbox.id = id;
+      }
+      checkbox.classList.add('checkbox');
+      checkbox.checked = checked || false;
+
+      checkbox.onchange = function () {
+        onchange && onchange(checkbox.checked);
+      };
+
+      container.appendChild(checkbox);
+
+      return container;
+    }
+
+    // Create controls based on configuration
+    const control = createCheckbox(config);
+    shadow.appendChild(control);
+
+    // Append the control to the global floating window
+    globalFloatingWindow.appendChild(this);
+  }
+}
+
 // Define the new element
+customElements.define('checkbox-component', CheckboxComponent);
 customElements.define('slider-component', SliderComponent);
 customElements.define('floating-window', FloatingWindow);
 
@@ -147,4 +219,4 @@ customElements.define('floating-window', FloatingWindow);
 //   },
 // });
 
-export { SliderComponent };
+export { SliderComponent, CheckboxComponent };
