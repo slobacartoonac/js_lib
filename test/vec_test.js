@@ -63,14 +63,14 @@ describe('Shape vector', function () {
 		assert.equal(res.length, 2)
 	})
 
-	it('add different vectors', function () {
+	it('add different vectors 1', function () {
 		var v9 = new Vector([3, 4])
 		var v10 = new Vector([3])
 		var res = v9.add(v10)
 		assert.equal(res.x, 6)
 		assert.equal(res.y, 4)
 	})
-	it('add different vectors', function () {
+	it('add different vectors 2', function () {
 		var v11 = new Vector([3])
 		var v12 = new Vector([3, 4])
 		var res = v11.add(v12)

@@ -7,32 +7,6 @@ function Vector() {
 	} else {
 		this.push(...Object.values(array))
 	}
-
-	Object.defineProperty(this, 'x', {
-		get() {
-			return this[0];
-		},
-		set(value) {
-			this[0] = value;
-		}
-	});
-	Object.defineProperty(this, 'y', {
-		get() {
-			return this[1];
-		},
-		set(value) {
-			this[1] = value;
-		}
-	});
-	Object.defineProperty(this, 'z', {
-		get() {
-			return this[2];
-		},
-		set(value) {
-			this[2] = value;
-		}
-	});
-	// Make 'length' property non-enumerable
 	Object.defineProperty(this, 'length', {
 		enumerable: false,
 		writable: true,
@@ -53,8 +27,26 @@ Vector.prototype = Object.create(Array.prototype, {
 		enumerable: false, // Make it non-enumerable, so it won't appear in `for...in` loop
 		writable: true,
 		configurable: true,
+		iterable: true
 	}
 })
+
+Vector.prototype.constructor = Vector;
+
+Vector.prototype.toJSON = function() {
+
+	if(!this.dataJSON){
+		this.dataJSON = {
+			__forceType: Vector.name
+		}
+	}
+	this.dataJSON.data = this.slice()
+	return this.dataJSON;
+};
+
+Object.defineProperty(Vector.prototype, 'toJSON', {
+	enumerable: false,
+});
 
 Vector.prototype.add = function (toAdd) {
 	let ret = this.copy()
@@ -69,6 +61,39 @@ Vector.prototype.add = function (toAdd) {
 
 Object.defineProperty(Vector.prototype, 'add', {
 	enumerable: false,
+  });
+
+  Object.defineProperty(Vector.prototype, 'x', {
+	get() {
+		return this[0];
+	},
+	set(value) {
+		this[0] = value;
+	}
+});
+Object.defineProperty(Vector.prototype, 'y', {
+	get() {
+		return this[1];
+	},
+	set(value) {
+		this[1] = value;
+	}
+});
+Object.defineProperty(Vector.prototype, 'z', {
+	get() {
+		return this[2];
+	},
+	set(value) {
+		this[2] = value;
+	}
+});
+Object.defineProperty(Vector.prototype, 'length', {
+	enumerable: false,
+	writable: true,
+  });
+Object.defineProperty(Vector.prototype, 'dataJSON', {
+	enumerable: false,
+	writable: true,
   });
 
 Vector.prototype.update = function (newValues) {

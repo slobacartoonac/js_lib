@@ -90,6 +90,28 @@ describe('EntityManager', function () {
 		var component_array = manager.get(Vector, entity)
 		assert.equal(component_array.length, 1)
 	})
+	it(`
+		it should add 1 component with Vector 
+		asign to two Entityes,
+		serialize,
+		desiarize
+		create other Manager change value and then aply to other`, function () {
+		var manager = new EntityManager()
+		var entity1 = manager.create()
+		var entity2 = manager.create()
+		var component = new Vector([5])
+		manager.asign(component, entity1)
+		manager.asign(component, entity2)
+		var stringManager = manager.toString()
+		var manager2 = EntityManager.fromString(stringManager, {"Vector": Vector})
 
+		var myVec = manager2.get(Vector, entity1)[0]
+		assert.equal(myVec.length, 1)
+		myVec.x = 3
+
+		var myVec2 = manager2.get(Vector, entity2)[0]
+		assert.equal(myVec2.length, 1)
+		assert.equal(myVec2.x, 3)
+	})
 })
 

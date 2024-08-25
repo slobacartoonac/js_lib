@@ -1,14 +1,18 @@
-function Entity() {}
+function randomInt(){
+	return 1+Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER))
+}
+
+function Entity(id) {
+	this.id = id || randomInt()
+}
 
 function EntityManager() {
-	this._entities = new Set()
 	this._components = new Map()
 }
 
 EntityManager.prototype.create = function () {
 	var entity = this.make_entity()
-	this._entities.add(entity)
-	this._components.set(entity, new Map())
+	this._components.set(entity.id, new Map())
 	return entity
 }
 
@@ -17,12 +21,11 @@ EntityManager.prototype.make_entity = function () {
 }
 
 EntityManager.prototype.alive = function (e) {
-	return this._entities.has(e)
+	return this._components.has(e.id)
 }
 
 EntityManager.prototype.destroy = function (e) {
-	this._components.delete(e)
-	this._entities.delete(e)
+	this._components.delete(e.id)
 }
 
 EntityManager.prototype.asign = function (component, e) {
@@ -32,14 +35,14 @@ EntityManager.prototype.asign = function (component, e) {
 	if(!(e instanceof Entity)){
 		throw Error(e+" is not Entity")
 	}
-	var entity_components = this._components.get(e)
+	var entity_components = this._components.get(e.id)
 	if (!entity_components) {
 		throw Error(e+" not Entity form this set")
 		return
 	}
 	var components_of_type = entity_components.get(component.constructor.name);
 	if (!components_of_type) {
-		let elComponents = this._components.get(e)
+		let elComponents = this._components.get(e.id)
 		elComponents.set(component.constructor.name, new Set([component]))
 		return
 	}
@@ -52,7 +55,7 @@ EntityManager.prototype.asign = function (component, e) {
 }
 
 EntityManager.prototype.get = function (c_type, e) {
-	var entity_components = this._components.get(e)
+	var entity_components = this._components.get(e.id || e)
 	if (!entity_components) {
 		return []
 	}
@@ -64,7 +67,7 @@ EntityManager.prototype.get = function (c_type, e) {
 }
 
 EntityManager.prototype.remove = function (component, e) {
-	var entity_components = this._components.get(e)
+	var entity_components = this._components.get(e.id)
 	if (!entity_components) {
 		return
 	}
@@ -76,11 +79,77 @@ EntityManager.prototype.remove = function (component, e) {
 }
 
 EntityManager.prototype.getEnities = function (c_type) {
-	return [...this._entities.values()].filter(
+	return [...this._components.keys()].filter(
 		(entity) => {
 			return entity && this.get(c_type, entity).length
 		}
 	)
+}
+
+EntityManager.prototype.toString = function (){
+    const seen = new WeakSet();
+
+    function replacer(key, value) {
+        if (value && typeof value === 'object') {
+            // Handle circular references
+            if (seen.has(value)) {
+                return Object.assign({}, value);
+            }
+            seen.add(value);
+
+            // Add type information
+            value.__type = value.constructor.name;
+			//if(value.__type == 'Vector') debugger
+			value.__id = randomInt();
+
+            // Continue traversal
+            return value;
+        }
+        return value;
+    }
+	let mapEnteries = Array.from(this._components.entries())
+		.map(([key,mapValue])=>[key, Array.from(mapValue.entries())
+			.map(([key,setValue])=> [key, Array.from(setValue)])])
+
+    return JSON.stringify(mapEnteries, replacer);
+}
+
+EntityManager.fromString = function(jsonString, classMap){
+	const seen = new Map();
+	Object.assign(classMap, {"Map": Map})
+    function reviver(key, value) {
+        if (value && typeof value === 'object' && value.__type) {
+            // Get the constructor function from classMap
+            const Constructor = classMap[value.__forceType || value.__type];
+            if (Constructor) {
+				if (seen.has(value.__id)) {
+					return seen.get(value.__id);
+				}
+				var data = value.__forceType ? value.data : value
+				Object.setPrototypeOf(data, Constructor.prototype);
+                // Remove the __type property
+				let id = value.__id
+                delete value.__type;
+				delete value.__id;
+				delete value.__forceType;
+				seen.set(id, data)
+                return data;
+            } else {
+				throw new Error("No classMap provided for "+value.__type)
+			}
+        }
+        return value;
+    }
+
+    let componentsEnteries = JSON.parse(jsonString, reviver)
+		.map(([key, value])=>[key,
+			new Map(value.map(([key, value])=>[
+				key, new Set(value)
+			]))])
+	let componentsMap = new Map(componentsEnteries)
+	let newEntityManager = new EntityManager()
+	Object.assign(newEntityManager, {_components: componentsMap});
+	return newEntityManager
 }
 
 export {
