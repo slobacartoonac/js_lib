@@ -105,13 +105,17 @@ describe('EntityManager', function () {
 		var stringManager = manager.toString()
 		var manager2 = EntityManager.fromString(stringManager, {"Vector": Vector})
 
+		let ent1Prim = manager2.getEnities(Vector)[0]
+
 		var myVec = manager2.get(Vector, entity1)[0]
 		assert.equal(myVec.length, 1)
 		myVec.x = 3
 
-		var myVec2 = manager2.get(Vector, entity2)[0]
+		var myVec2 = manager2.get(Vector, ent1Prim)[0]
 		assert.equal(myVec2.length, 1)
 		assert.equal(myVec2.x, 3)
+		assert.notEqual(ent1Prim, entity1)
+		assert.deepEqual(ent1Prim, entity1)
 	})
 })
 

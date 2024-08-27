@@ -7,11 +7,13 @@ function Entity(id) {
 }
 
 function EntityManager() {
+	this._entities = new Map()
 	this._components = new Map()
 }
 
 EntityManager.prototype.create = function () {
 	var entity = this.make_entity()
+	this._entities.set(entity.id, entity)
 	this._components.set(entity.id, new Map())
 	return entity
 }
@@ -21,10 +23,11 @@ EntityManager.prototype.make_entity = function () {
 }
 
 EntityManager.prototype.alive = function (e) {
-	return this._components.has(e.id)
+	return this._entities.has(e.id)
 }
 
 EntityManager.prototype.destroy = function (e) {
+	this._entities.delete(e.id)
 	this._components.delete(e.id)
 }
 
@@ -55,7 +58,7 @@ EntityManager.prototype.asign = function (component, e) {
 }
 
 EntityManager.prototype.get = function (c_type, e) {
-	var entity_components = this._components.get(e.id || e)
+	var entity_components = this._components.get(e.id)
 	if (!entity_components) {
 		return []
 	}
@@ -79,11 +82,15 @@ EntityManager.prototype.remove = function (component, e) {
 }
 
 EntityManager.prototype.getEnities = function (c_type) {
-	return [...this._components.keys()].filter(
+	const res = []
+	this._entities.forEach(
 		(entity) => {
-			return entity && this.get(c_type, entity).length
+			if(entity && this.get(c_type, entity).length){
+				res.push(entity)
+			}
 		}
 	)
+	return res
 }
 
 EntityManager.prototype.toString = function (){
@@ -147,8 +154,10 @@ EntityManager.fromString = function(jsonString, classMap){
 				key, new Set(value)
 			]))])
 	let componentsMap = new Map(componentsEnteries)
+	let entitiesMap = new Map([...componentsMap.keys()].map(id=>[id, new Entity(id)]))
 	let newEntityManager = new EntityManager()
 	Object.assign(newEntityManager, {_components: componentsMap});
+	Object.assign(newEntityManager, {_entities: entitiesMap})
 	return newEntityManager
 }
 
