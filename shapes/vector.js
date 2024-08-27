@@ -33,20 +33,6 @@ Vector.prototype = Object.create(Array.prototype, {
 
 Vector.prototype.constructor = Vector;
 
-Vector.prototype.toJSON = function() {
-
-	if(!this.dataJSON){
-		this.dataJSON = {
-			__forceType: Vector.name
-		}
-	}
-	this.dataJSON.data = this.slice()
-	return this.dataJSON;
-};
-
-Object.defineProperty(Vector.prototype, 'toJSON', {
-	enumerable: false,
-});
 
 Vector.prototype.add = function (toAdd) {
 	let ret = this.copy()
@@ -88,10 +74,6 @@ Object.defineProperty(Vector.prototype, 'z', {
 	}
 });
 Object.defineProperty(Vector.prototype, 'length', {
-	enumerable: false,
-	writable: true,
-  });
-Object.defineProperty(Vector.prototype, 'dataJSON', {
 	enumerable: false,
 	writable: true,
   });

@@ -95,22 +95,38 @@ EntityManager.prototype.getEnities = function (c_type) {
 
 EntityManager.prototype.toString = function (){
     const seen = new WeakSet();
+	const arrayLike = new WeakMap(); 
 
     function replacer(key, value) {
         if (value && typeof value === 'object') {
+			if(Array.isArray(value)){
+				return value
+			}
+			let myObject = value
+			if(value instanceof Array){
+				if(arrayLike.has(value)){
+					myObject = arrayLike.get(value)
+				} else {
+					myObject = {
+						__forceType: value.constructor.name,
+						data: value.slice()
+					}
+					arrayLike.set(value, myObject)
+				}
+			}
             // Handle circular references
-            if (seen.has(value)) {
-                return Object.assign({}, value);
+            if (seen.has(myObject)) {
+                return Object.assign({}, myObject);
             }
-            seen.add(value);
+            seen.add(myObject);
 
             // Add type information
-            value.__type = value.constructor.name;
+            myObject.__type = value.constructor.name;
 			//if(value.__type == 'Vector') debugger
-			value.__id = randomInt();
+			myObject.__id = randomInt();
 
             // Continue traversal
-            return value;
+            return myObject;
         }
         return value;
     }
