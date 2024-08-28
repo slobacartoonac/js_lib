@@ -137,19 +137,29 @@ EntityManager.prototype.toString = function (){
     return JSON.stringify(mapEnteries, replacer);
 }
 
-EntityManager.fromString = function(jsonString, classMap){
+EntityManager.fromString = function(jsonString, classes){
+	let entries = classes.map(cl=>[cl.name, cl])
+	const classMap = new Map(entries)
 	const seen = new Map();
 	Object.assign(classMap, {"Map": Map})
     function reviver(key, value) {
         if (value && typeof value === 'object' && value.__type) {
             // Get the constructor function from classMap
-            const Constructor = classMap[value.__forceType || value.__type];
-            if (Constructor) {
+            const instanceType = value.__forceType || value.__type;
+            if (classMap.has(instanceType)) {
+				const Constructor = classMap.get(instanceType)
 				if (seen.has(value.__id)) {
 					return seen.get(value.__id);
 				}
 				var data = value.__forceType ? value.data : value
-				Object.setPrototypeOf(data, Constructor.prototype);
+				if(Array.isArray(data)){
+					let data1 = data
+					data = Object.create(Constructor.prototype)
+					data.push(...data1)
+				}
+				else{
+					Object.setPrototypeOf(data, Constructor.prototype);
+				}
                 // Remove the __type property
 				let id = value.__id
                 delete value.__type;

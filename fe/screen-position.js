@@ -6,25 +6,10 @@ function ScreenPosition(screen, options) {
     this.push(0, 0, 1, 0)
     this.screen = screen;
     Object.assign(this, options || {})
-    Object.defineProperty(this, 'scale', {
-        get() {
-            return this[2];
-        },
-        set(value) {
-            this[2] = value;
-        }
-    });
-    Object.defineProperty(this, 'angle', {
-        get() {
-            return this[3];
-        },
-        set(value) {
-            this[3] = value;
-        }
-    });
 }
 
 ScreenPosition.prototype = Object.create(Vector.prototype)
+ScreenPosition.prototype.constructor = ScreenPosition
 
 
 ScreenPosition.prototype.zoom = function (scaleFactor, x, y) {
@@ -89,5 +74,23 @@ ScreenPosition.prototype.saveToLocalStorage = function () {
         localStorage.setItem(this.localStorageKey, JSON.stringify(this))
     }
 }
+
+
+Object.defineProperty(ScreenPosition.prototype, 'scale', {
+    get() {
+        return this[2];
+    },
+    set(value) {
+        this[2] = value;
+    }
+});
+Object.defineProperty(ScreenPosition.prototype, 'angle', {
+    get() {
+        return this[3];
+    },
+    set(value) {
+        this[3] = value;
+    }
+});
 
 export { ScreenPosition }

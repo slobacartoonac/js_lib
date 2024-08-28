@@ -1,5 +1,6 @@
 var assert = require('assert')
 import { EntityManager } from '../ecs'
+import { ScreenPosition } from '../fe/screen-position'
 import { Vector } from '../shapes/vector'
 
 describe('EntityManager', function () {
@@ -103,7 +104,7 @@ describe('EntityManager', function () {
 		manager.asign(component, entity1)
 		manager.asign(component, entity2)
 		var stringManager = manager.toString()
-		var manager2 = EntityManager.fromString(stringManager, {"Vector": Vector})
+		var manager2 = EntityManager.fromString(stringManager, [Vector])
 
 		let ent1Prim = manager2.getEnities(Vector)[0]
 
@@ -116,6 +117,41 @@ describe('EntityManager', function () {
 		assert.equal(myVec2.x, 3)
 		assert.notEqual(ent1Prim, entity1)
 		assert.deepEqual(ent1Prim, entity1)
+	})
+
+	it(`
+		it should save twice and load to ensure proper load, test multiple inheretance`, function () {
+		function Component(a) {
+			this.a = a
+		}
+		var manager = new EntityManager()
+		var entity1 = manager.create()
+		var component = new Vector([5])
+		manager.asign(component, entity1)
+		var component1 = new Component(5)
+		manager.asign(component1, entity1)
+
+
+		var sc = new ScreenPosition()
+		manager.asign(sc, entity1)
+		sc.angle = 5
+
+		var stringManager = manager.toString()
+		var string2 = EntityManager.fromString(stringManager, [Vector, Component, ScreenPosition]).toString()
+		var manager2 = EntityManager.fromString(string2, [Vector, Component, ScreenPosition])
+
+		let ent1Prim = manager2.getEnities(Vector)[0]
+
+		var myVec = manager2.get(Vector, entity1)[0]
+		assert.equal(myVec.length, 1)
+		assert.notEqual(ent1Prim, entity1)
+		assert.deepEqual(ent1Prim, entity1)
+
+		var myCom = manager2.get(Component, entity1)[0]
+		assert.equal(myCom.a, 5)
+
+		var mySc = manager2.get(ScreenPosition, entity1)[0]
+		assert.equal(mySc.angle, 5)
 	})
 })
 
