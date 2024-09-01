@@ -91,8 +91,7 @@ describe('EntityManager', function () {
 		var component_array = manager.get(Vector, entity)
 		assert.equal(component_array.length, 1)
 	})
-	it(`
-		it should add 1 component with Vector 
+	it(`it should add 1 component with Vector 
 		asign to two Entityes,
 		serialize,
 		desiarize
@@ -119,8 +118,7 @@ describe('EntityManager', function () {
 		assert.deepEqual(ent1Prim, entity1)
 	})
 
-	it(`
-		it should save twice and load to ensure proper load, test multiple inheretance`, function () {
+	it(`it should save twice and load to ensure proper load, test multiple inheretance`, function () {
 		function Component(a) {
 			this.a = a
 		}
@@ -153,5 +151,40 @@ describe('EntityManager', function () {
 		var mySc = manager2.get(ScreenPosition, entity1)[0]
 		assert.equal(mySc.angle, 5)
 	})
+
+	it('should handle invalid operations gracefully', function () {
+		var manager = new EntityManager();
+		var entity = manager.create();
+		manager.destroy(entity)
+		assert.throws(() => manager.get(Position, entity));
+	});
+
+	it('should handle null or undefined components gracefully', function () {
+		var manager = new EntityManager();
+		var entity = manager.create();
+		assert.throws(() => manager.asign(null, entity));
+		assert.throws(() => manager.remove(null, entity));
+	});
+	
+	it('should measure time to create and destroy 10000 entities', function () {
+		function ComponentCommon() {
+		}
+		function ComponentRare(){
+		}
+		var manager = new EntityManager();
+		for (let i = 0; i < 100_000; i++) {
+		  var entity = manager.create();
+		  manager.asign(new ComponentCommon(), entity);
+		  if(i%150 === 0){
+			manager.asign(new ComponentRare(), entity);
+		  }
+		}
+		console.time('throughputTestC');
+		manager.getEnities(ComponentCommon)
+		console.timeEnd('throughputTestC');
+		console.time('throughputTestR');
+		manager.getEnities(ComponentRare)
+		console.timeEnd('throughputTestR');
+	});
 })
 

@@ -14,7 +14,6 @@ function EntityManager() {
 EntityManager.prototype.create = function () {
 	var entity = this.make_entity()
 	this._entities.set(entity.id, entity)
-	this._components.set(entity.id, new Map())
 	return entity
 }
 
@@ -28,7 +27,14 @@ EntityManager.prototype.alive = function (e) {
 
 EntityManager.prototype.destroy = function (e) {
 	this._entities.delete(e.id)
-	this._components.delete(e.id)
+	// ["ComponentType",
+	// 	["EntityId", ["ComponentInstance"]]
+	// ]
+	this._components.forEach((value)=>{
+		if(value.has(e.id)){
+			value.delete(e.id)
+		}
+	})
 }
 
 EntityManager.prototype.asign = function (component, e) {
@@ -38,31 +44,39 @@ EntityManager.prototype.asign = function (component, e) {
 	if(!(e instanceof Entity)){
 		throw Error(e+" is not Entity")
 	}
-	var entity_components = this._components.get(e.id)
-	if (!entity_components) {
+	var entity = this._entities.get(e.id)
+	if (!entity) {
 		throw Error(e+" not Entity form this set")
 		return
 	}
-	var components_of_type = entity_components.get(component.constructor.name);
-	if (!components_of_type) {
-		let elComponents = this._components.get(e.id)
-		elComponents.set(component.constructor.name, new Set([component]))
+
+	var componentTypeName = component.constructor.name
+
+	var entitiesMap = this._components.get(componentTypeName)
+	if (!entitiesMap) {
+		let entitiesMap = new Map()
+		entitiesMap.set(e.id, new Set([component]))
+		this._components.set(componentTypeName, entitiesMap)
 		return
 	}
-	if (components_of_type &&
-		entity_components.get(component.constructor.name).has(component)
-	){
+	let componetSet =  entitiesMap.get(e.id)
+	if (!componetSet) {
+		entitiesMap.set(e.id, new Set([component]))
+		return
+	}
+
+	if (componetSet.has(component)){
 		throw Error('Component is allready asiged')
 	}
-	components_of_type.add(component)
+	componetSet.add(component)
 }
 
 EntityManager.prototype.get = function (c_type, e) {
-	var entity_components = this._components.get(e.id)
+	var entity_components = this._components.get(c_type.name)
 	if (!entity_components) {
 		return []
 	}
-	var components_of_type = entity_components.get(c_type.name)
+	var components_of_type = entity_components.get(e.id)
 	if (!components_of_type) {
 		return []
 	}
@@ -70,23 +84,26 @@ EntityManager.prototype.get = function (c_type, e) {
 }
 
 EntityManager.prototype.remove = function (component, e) {
-	var entity_components = this._components.get(e.id)
+	var entity_components = this._components.get(component.constructor.name)
 	if (!entity_components) {
 		return
 	}
-	var components_of_type = entity_components.get(component.constructor.name)
-	if (!components_of_type) {
+	var components_of_entity = entity_components.get(e.id)
+	if (!components_of_entity) {
 		return
 	}
-	components_of_type.delete(component)
+	components_of_entity.delete(component)
 }
 
 EntityManager.prototype.getEnities = function (c_type) {
+	if(!this._components.has(c_type.name)){
+		return []
+	}
 	const res = []
-	this._entities.forEach(
-		(entity) => {
-			if(entity && this.get(c_type, entity).length){
-				res.push(entity)
+	this._components.get(c_type.name).forEach(
+		(components, eid) => {
+			if(components && components.size){
+				res.push(this._entities.get(eid))
 			}
 		}
 	)
@@ -179,10 +196,15 @@ EntityManager.fromString = function(jsonString, classes){
 			new Map(value.map(([key, value])=>[
 				key, new Set(value)
 			]))])
-	let componentsMap = new Map(componentsEnteries)
-	let entitiesMap = new Map([...componentsMap.keys()].map(id=>[id, new Entity(id)]))
+	let componentsTypesMapMap = new Map(componentsEnteries)
+	let entitiesSet = new Set()
+	let addEnt =  entitiesSet.add.bind(entitiesSet)
+	componentsTypesMapMap.forEach((value)=>{
+		[...value.keys()].forEach(addEnt)
+	})
+	let entitiesMap = new Map([...entitiesSet.values()].map(id=>[id, new Entity(id)]))
 	let newEntityManager = new EntityManager()
-	Object.assign(newEntityManager, {_components: componentsMap});
+	Object.assign(newEntityManager, {_components: componentsTypesMapMap});
 	Object.assign(newEntityManager, {_entities: entitiesMap})
 	return newEntityManager
 }
