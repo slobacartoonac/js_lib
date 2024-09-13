@@ -6,9 +6,13 @@ function LinearGravityEngine(manager, interaction) {
 	this.interaction = interaction ? interaction : 0.1
 }
 
+function LinearGravity(interaction){
+	this.asc = [0, 0.1] || interaction
+}
+
 LinearGravityEngine.prototype.compute = function () {
 
-	var physic_entity = this.manager.getEnities(Physics)
+	var physic_entity = this.manager.getEnities(Physics).filter((elem) => this.manager.get(LinearGravity, elem).length > 0)
 		.map((elem) => {
 			var physics = this.manager.get(Physics, elem)[0]
 			var transform = this.manager.get(Transform, elem)[0]
@@ -28,5 +32,5 @@ LinearGravityEngine.prototype.compute = function () {
 }
 
 export {
-	LinearGravityEngine
+	LinearGravityEngine, LinearGravity
 }
