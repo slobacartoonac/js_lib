@@ -85,6 +85,39 @@ function distance(aX, aY, bX, bY) {
     return magnitude(aX - bX, aY - bY)
 }
 
+function ballLineCollisionVec(ballCenter, radius, linePoint1, linePoint2) {
+    return ballLineCollision(ballCenter.x, ballCenter.y, radius, linePoint1.x, linePoint1.y, linePoint2.x, linePoint2.y)
+}
+function ballLineCollision(ballCenterX, ballCenterY, radius, linePoint1X, linePoint1Y, linePoint2X, linePoint2Y) {
+    // Step 1: Calculate the vector representing the line segment
+    let lineVecX = linePoint2X - linePoint1X;
+    let lineVecY = linePoint2Y - linePoint1Y;
+
+    // Step 2: Calculate the squared length of the line segment
+    let lineLengthSquared = lineVecX * lineVecX + lineVecY * lineVecY;
+
+    // Step 3: Early exit if the line is a point (degenerate line)
+    if (lineLengthSquared === 0) {
+        // If the line is a point, just check the distance from the point to the ball center
+        let distSquared = (ballCenterX - linePoint1X) ** 2 + (ballCenterY - linePoint1Y) ** 2;
+        return distSquared <= radius * radius;
+    }
+
+    // Step 4: Calculate the projection scalar t (clamp it between 0 and 1)
+    let t = ((ballCenterX - linePoint1X) * lineVecX + (ballCenterY - linePoint1Y) * lineVecY) / lineLengthSquared;
+    t = Math.max(0, Math.min(1, t)); // Clamp t to [0, 1]
+
+    // Step 5: Find the closest point on the line segment
+    let closestX = linePoint1X + t * lineVecX;
+    let closestY = linePoint1Y + t * lineVecY;
+
+    // Step 6: Calculate the squared distance from the ball center to the closest point
+    let distSquared = (ballCenterX - closestX) ** 2 + (ballCenterY - closestY) ** 2;
+
+    // Step 7: Return true if the distance is less than or equal to the radius squared
+    return distSquared <= radius * radius;
+}
+
 export {
     pointInTriangle,
     dot,
@@ -95,5 +128,7 @@ export {
     interpolateVecs,
     interpolate,
     distance,
-    magnitude
+    magnitude,
+    ballLineCollisionVec,
+    ballLineCollision
 }
