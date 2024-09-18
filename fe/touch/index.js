@@ -84,12 +84,12 @@ function Touch(div, deadzone) {
 		if (this.preventDefault) {
 			e.preventDefault();
 		}
+		const { top, left } = e.currentTarget.getBoundingClientRect()
+		this.centerPosition = { x: e.clientX - left, y: e.clientY - top }
 		if(e.buttons === 0){
 			stopTouch(e)
 			return;
 		}
-		const { top, left } = e.currentTarget.getBoundingClientRect()
-		this.centerPosition = { x: e.clientX - left, y: e.clientY - top }
 		if (mouseDown){
 			if(e.type == 'drag' && e.clientX == 0 && e.clientY == 0){
 				return

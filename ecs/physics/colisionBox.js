@@ -61,24 +61,28 @@ function collisionResponse(circle, circleTransform, circlePhysics, box, boxTrans
 
     var overlapX = Math.max(minX - circleTransform.positions[0], circleTransform.positions[0] - maxX)
     var overlapY = Math.max(minY - circleTransform.positions[1], circleTransform.positions[1] - maxY)
+    
+    const EPSILON = 0.01
     // Determine the axis of least penetration
     if (overlapX > overlapY) {
-        // Bounce the circle off the box horizontally
-        circlePhysics.speeds[0] *= -0.1
+
         // Expell the circle from the box
         if (minX - circleTransform.positions[0] > circleTransform.positions[0] - maxX) {
-            circleTransform.positions[0] = boxTransform.positions[0] - circle.radius
+            circleTransform.positions[0] = boxTransform.positions[0] - circle.radius - EPSILON
+            circlePhysics.speeds[0] = -0.01 * Math.abs(circlePhysics.speeds[0])
+
         } else{
-            circleTransform.positions[0] = boxTransform.positions[0] + box.x + circle.radius
+            circleTransform.positions[0] = boxTransform.positions[0] + box.x + circle.radius + EPSILON
+            circlePhysics.speeds[0] = 0.01 * Math.abs(circlePhysics.speeds[0])
         }
     } else {
-        // Bounce the circle off the box vertically
-        circlePhysics.speeds[1] *= -0.1
         // Expell the circle from the box
         if (minY - circleTransform.positions[1] > circleTransform.positions[1] - maxY) {
-            circleTransform.positions[1] = boxTransform.positions[1] - circle.radius
+            circleTransform.positions[1] = boxTransform.positions[1] - circle.radius - EPSILON
+            circlePhysics.speeds[1] = -0.01 * Math.abs(circlePhysics.speeds[1])
         } else {
-            circleTransform.positions[1] = boxTransform.positions[1] + box.y + circle.radius
+            circleTransform.positions[1] = boxTransform.positions[1] + box.y + circle.radius + EPSILON
+            circlePhysics.speeds[1] = 0.01 * Math.abs(circlePhysics.speeds[1])
         }
     }
 }
