@@ -29,63 +29,58 @@ CollisionEngine.prototype.compute = function () {
 
             // Check for collision between circle and box
             if (circleBoxCollision(shapeA, transformA, shapeB, transformB)) {
-                // Check if the circle is moving towards the box
-                var relativeVelocityX = physicsA.speeds[0] - physicsB.speeds[0]
-                var relativeVelocityY = physicsA.speeds[1] - physicsB.speeds[1]
-                var relativePositionX = transformA.positions[0] - transformB.positions[0] + shapeB.x / 2
-                var relativePositionY = transformA.positions[1] - transformB.positions[1] + shapeB.y / 2
-                var dotProduct = relativeVelocityX * relativePositionX + relativeVelocityY * relativePositionY
-
-                if (dotProduct > 0) {
                     // Handle collision response
                     collisionResponse(shapeA, transformA, physicsA, shapeB, transformB, physicsB)
-                }
             }
         }
     }
 }
 function circleBoxCollision(circle, circleTransform, box, boxTransform) {
     // Calculate the closest point on the box to the circle
-    var closestX = clamp(circleTransform.positions[0], boxTransform.positions[0], boxTransform.positions[0] + box.x )
-    var closestY = clamp(circleTransform.positions[1], boxTransform.positions[1], boxTransform.positions[1] + box.y )
+    var minX = boxTransform.positions[0] - circle.radius
+    var maxX = boxTransform.positions[0] + box.x + circle.radius
+    
+    var minY = boxTransform.positions[1] - circle.radius
+    var maxY = boxTransform.positions[1] + box.y + circle.radius
 
     // Calculate the distance between the circle center and the closest point
-    var distanceX = circleTransform.positions[0] - closestX
-    var distanceY = circleTransform.positions[1] - closestY
+    var distanceX = Math.max(minX - circleTransform.positions[0], circleTransform.positions[0] - maxX)
+    var distanceY = Math.max(minY - circleTransform.positions[1], circleTransform.positions[1] - maxY)
 
     // Check if the distance is less than or equal to the circle radius
-    return (distanceX * distanceX + distanceY * distanceY) <= (circle.radius * circle.radius)
+    return Math.max(distanceX, distanceY) < 0
 }
 
-function collisionResponse(circle, circleTransform, circlePhysics, box, boxTransform, boxPhysics) {
+function collisionResponse(circle, circleTransform, circlePhysics, box, boxTransform) {
     // Calculate the overlap between the circle and the box
-    var overlapX = Math.abs(circleTransform.positions[0] - boxTransform.positions[0]) - (box.x / 2)
-    var overlapY = Math.abs(circleTransform.positions[1] - boxTransform.positions[1]) - (box.y / 2)
+    var minX = boxTransform.positions[0] - circle.radius
+    var maxX = boxTransform.positions[0] + box.x + circle.radius
+    
+    var minY = boxTransform.positions[1] - circle.radius
+    var maxY = boxTransform.positions[1] + box.y + circle.radius
 
+    var overlapX = Math.max(minX - circleTransform.positions[0], circleTransform.positions[0] - maxX)
+    var overlapY = Math.max(minY - circleTransform.positions[1], circleTransform.positions[1] - maxY)
     // Determine the axis of least penetration
-    if (overlapX < overlapY) {
+    if (overlapX > overlapY) {
         // Bounce the circle off the box horizontally
-        circlePhysics.speeds[1] *= 0
+        circlePhysics.speeds[0] *= -0.1
         // Expell the circle from the box
-        if (circleTransform.positions[0] < boxTransform.positions[0]) {
+        if (minX - circleTransform.positions[0] > circleTransform.positions[0] - maxX) {
             circleTransform.positions[0] = boxTransform.positions[0] - circle.radius
-        } else if (circleTransform.positions[0] > boxTransform.positions[0] + box.x) {
+        } else{
             circleTransform.positions[0] = boxTransform.positions[0] + box.x + circle.radius
         }
     } else {
         // Bounce the circle off the box vertically
-        circlePhysics.speeds[1] *= 0
+        circlePhysics.speeds[1] *= -0.1
         // Expell the circle from the box
-        if (circleTransform.positions[1] < boxTransform.positions[1]) {
+        if (minY - circleTransform.positions[1] > circleTransform.positions[1] - maxY) {
             circleTransform.positions[1] = boxTransform.positions[1] - circle.radius
-        } else if (circleTransform.positions[1] > boxTransform.positions[1] + box.y) {
+        } else {
             circleTransform.positions[1] = boxTransform.positions[1] + box.y + circle.radius
         }
     }
-}
-
-function clamp(value, min, max) {
-    return Math.max(min, Math.min(value, max))
 }
 
 export { CollisionEngine }

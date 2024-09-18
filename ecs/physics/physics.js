@@ -28,7 +28,7 @@ Physics.prototype.compute = function () {
 	for (i = 0; i < this.speeds.length; i++) {
 		speedValue += this.speeds[i] * this.speeds[i]
 	}
-
+	if(speedValue === 0) return
 	var speedMultipliyer = Math.min(1 - this.drag, this.maxSpeed / speedValue)
 
 	for (i = 0; i < this.speeds.length; i++) {
