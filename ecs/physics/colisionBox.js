@@ -28,20 +28,20 @@ CollisionEngine.prototype.compute = function () {
             var physicsB = this.manager.get(Physics, entityB)[0]
 
             // Check for collision between circle and box
-            if (circleBoxCollision(shapeA, transformA, shapeB, transformB)) {
+            if (circleBoxCollision(shapeA, transformA, physicsA, shapeB, transformB)) {
                     // Handle collision response
                     collisionResponse(shapeA, transformA, physicsA, shapeB, transformB, physicsB)
             }
         }
     }
 }
-function circleBoxCollision(circle, circleTransform, box, boxTransform) {
+function circleBoxCollision(circle, circleTransform, circlePhysics, box, boxTransform) {
     // Calculate the closest point on the box to the circle
-    var minX = boxTransform.positions[0] - circle.radius
-    var maxX = boxTransform.positions[0] + box.x + circle.radius
+    var minX = boxTransform.positions[0] - circle.radius - circlePhysics.speeds[0]
+    var maxX = boxTransform.positions[0] + box.x + circle.radius - circlePhysics.speeds[0]
     
-    var minY = boxTransform.positions[1] - circle.radius
-    var maxY = boxTransform.positions[1] + box.y + circle.radius
+    var minY = boxTransform.positions[1] - circle.radius - circlePhysics.speeds[1]
+    var maxY = boxTransform.positions[1] + box.y + circle.radius - circlePhysics.speeds[1]
 
     // Calculate the distance between the circle center and the closest point
     var distanceX = Math.max(minX - circleTransform.positions[0], circleTransform.positions[0] - maxX)
