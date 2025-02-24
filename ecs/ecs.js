@@ -6,19 +6,63 @@ function Entity(id) {
 	this.id = id || randomInt()
 }
 
-function EntityManager() {
+function EntityNice(id, manager) {
+	Entity.call(this, id); 
+	this._manager = manager;
+}
+
+// Inherit from Entity
+EntityNice.prototype = Object.create(Entity.prototype);
+EntityNice.prototype.constructor = EntityNice;
+
+// Prototype methods use the entity's assigned manager
+EntityNice.prototype.get = function (componentType) {
+    return this._manager.get(componentType, this);
+};
+
+EntityNice.prototype.has = function (componentType) {
+    return this._manager.get(componentType, this).length > 0;
+};
+
+EntityNice.prototype.assign = function (component) {
+    this._manager.assign(component, this);
+};
+
+EntityNice.prototype.remove = function (componentType) {
+    this._manager.remove(componentType, this);
+};
+
+EntityNice.prototype.destroy = function () {
+	this._manager.destroy(this);
+};
+
+function EntityManager(isNice) {
 	this._entities = new Map()
 	this._components = new Map()
+	this._nice = !!isNice
 }
 
 EntityManager.prototype.create = function () {
+	if(this._nice){
+		return this.create_nice()
+	}
 	var entity = this.make_entity()
+	this._entities.set(entity.id, entity)
+	return entity
+}
+
+EntityManager.prototype.create_nice = function () {
+	var entity = this.make_entity_nice()
 	this._entities.set(entity.id, entity)
 	return entity
 }
 
 EntityManager.prototype.make_entity = function () {
 	return new Entity()
+}
+
+EntityManager.prototype.make_entity_nice = function () {
+	return new EntityNice(undefined,this)
 }
 
 EntityManager.prototype.alive = function (e) {
@@ -70,6 +114,8 @@ EntityManager.prototype.asign = function (component, e) {
 	}
 	componetSet.add(component)
 }
+
+EntityManager.prototype.assign = EntityManager.prototype.asign
 
 EntityManager.prototype.get = function (c_type, e) {
 	var entity_components = this._components.get(c_type.name)
@@ -202,8 +248,10 @@ EntityManager.fromString = function(jsonString, classes){
 	componentsTypesMapMap.forEach((value)=>{
 		[...value.keys()].forEach(addEnt)
 	})
-	let entitiesMap = new Map([...entitiesSet.values()].map(id=>[id, new Entity(id)]))
+
 	let newEntityManager = new EntityManager()
+	let entitiesMap = new Map([...entitiesSet.values()].map(id=>[id, new Entity(id, newEntityManager)]))
+	
 	Object.assign(newEntityManager, {_components: componentsTypesMapMap});
 	Object.assign(newEntityManager, {_entities: entitiesMap})
 	return newEntityManager

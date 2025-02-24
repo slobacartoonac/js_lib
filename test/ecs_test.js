@@ -115,7 +115,7 @@ describe('EntityManager', function () {
 		assert.equal(myVec2.length, 1)
 		assert.equal(myVec2.x, 3)
 		assert.notEqual(ent1Prim, entity1)
-		assert.deepEqual(ent1Prim, entity1)
+		assert.equal(ent1Prim.id, entity1.id)
 	})
 
 	it(`it should save twice and load to ensure proper load, test multiple inheretance`, function () {
@@ -143,7 +143,7 @@ describe('EntityManager', function () {
 		var myVec = manager2.get(Vector, entity1)[0]
 		assert.equal(myVec.length, 1)
 		assert.notEqual(ent1Prim, entity1)
-		assert.deepEqual(ent1Prim, entity1)
+		assert.equal(ent1Prim.id, entity1.id)
 
 		var myCom = manager2.get(Component, entity1)[0]
 		assert.equal(myCom.a, 5)
@@ -187,4 +187,102 @@ describe('EntityManager', function () {
 		console.timeEnd('throughputTestR');
 	});
 })
+
+describe('Entity and EntityManager Tests', function () {
+    function Component(a) {
+        this.a = a;
+    }
+    Component.prototype.f = function () {
+        this.a++;
+    };
+
+    it('should add, retrieve, execute, and remove components using entity methods', function () {
+        var manager = new EntityManager(true);
+        var entity = manager.create();
+
+        // Assign component
+        var component = new Component(5);
+        entity.assign(component);
+
+        // Retrieve components and verify
+        var component_array = entity.get(Component);
+        assert.equal(component_array.length, 1);
+        assert.equal(component_array[0].a, 5);
+
+        // Execute function
+        component_array.forEach(element => element.f());
+        assert.equal(component_array[0].a, 6);
+
+        // Assign another component
+        entity.assign(new Component(3));
+
+        // Remove first component
+        entity.remove(component);
+        assert.equal(entity.get(Component).length, 1);
+
+        // Destroy entity and verify cleanup
+        manager.destroy(entity);
+        assert.equal(entity.get(Component).length, 0);
+    });
+
+    it('should create multiple entities with unique IDs', function () {
+        var manager = new EntityManager(true);
+        var entity1 =  manager.create();
+        var entity2 =  manager.create();
+        assert.notEqual(entity1.id, entity2.id);
+    });
+
+    it('should handle multiple components per entity', function () {
+        var manager = new EntityManager(true);
+        var entity =  manager.create();
+        var component1 = new Component(10);
+        var component2 = new Component(20);
+
+        entity.assign(component1);
+        entity.assign(component2);
+
+        var components = entity.get(Component);
+        assert.equal(components.length, 2);
+        assert.equal(components[0].a, 10);
+        assert.equal(components[1].a, 20);
+    });
+
+    it('should check for component existence', function () {
+        var manager = new EntityManager(true);
+        var entity =  manager.create();
+
+        assert.equal(entity.has(Component), false);
+
+        entity.assign(new Component(42));
+        assert.equal(entity.has(Component), true);
+    });
+
+    it('should not remove unrelated components', function () {
+        var manager = new EntityManager(true);
+        var entity =  manager.create();
+        var component1 = new Component(15);
+        var component2 = new Component(25);
+
+        entity.assign(component1);
+        entity.assign(component2);
+
+        entity.remove(component1); // Removes only one of them
+
+        var remainingComponents = entity.get(Component);
+        assert.equal(remainingComponents.length, 1);
+        assert.equal(remainingComponents[0].a, 25);
+    });
+
+    it('should properly destroy an entity and remove all components', function () {
+        var manager = new EntityManager(true);
+        var entity =  manager.create();
+        entity.assign(new Component(7));
+        entity.assign(new Component(14));
+
+        entity.destroy();
+
+        assert.equal(entity.get(Component).length, 0);
+    });
+});
+
 
