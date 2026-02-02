@@ -33,7 +33,8 @@ FunctionPloter.prototype.draw = function (view, func, color) {
 		context.lineTo(x, scrY)
 	}
 	context.lineWidth = 2
-	context.strokeStyle = color || 'rgba(0, 0, 0, 1)'
+	const colorS = typeof color === 'string' ? color : `rgba(${(color >> 16) & 0xff}, ${(color >> 8) & 0xff}, ${color & 0xff}, 1)`
+	context.strokeStyle = colorS || 'rgba(0, 0, 0, 1)'
 	context.stroke()
 }
 
