@@ -1,6 +1,6 @@
 {
     "name": "touch-and-mouse-carousel",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "description": "A library for touch and mouse related carousel.",
     "main": "index.js",
     "scripts": {
@@ -10,6 +10,6 @@
     "author": "Slobodan Zivkovic",
     "license": "MIT",
     "dependencies": {
-      "touch-and-mouse": "https://gitpkg.now.sh/slobacartoonac/js_lib/fe/touch?main"
+      "touch-and-mouse": "github:slobacartoonac/js_lib#main:fe/touch"
     }
 }
